@@ -19,3 +19,11 @@ This is the directory where you should put all your persisten data.
 # VS Code
 
 Install the extension "Remote - Containers" to attach the editor to the container.
+
+# To create a key
+
+Run the following command, and just press enter when asked for a password. 
+
+```bash
+ssh-keygen -t ed25519 -C <your_email> 
+```
