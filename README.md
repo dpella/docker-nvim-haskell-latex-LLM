@@ -22,8 +22,8 @@ Install the extension "Remote - Containers" to attach the editor to the containe
 
 # To create a key
 
-Run the following command, and just press enter when asked for a password. 
+Run the following command inside the `ssh` directory, and just press enter when asked for a password. 
 
 ```bash
-ssh-keygen -t ed25519 -C <your_email> 
+ssh-keygen -t ed25519 -C <your_email> -f ./key
 ```
