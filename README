@@ -1,15 +1,20 @@
+# Repository to create docker images 
+
+- GHC 8.6.5
+- Latex (all packages)
 
 # SSH Keys:
 
-Create a folder called `ssh` next to the Dockerfile and copy your `id_rsa` and `id_rsa.pub` inside.
+Once you clone this repo, you should get into `ssh` and add your private / public keys to connect to Github or Bitbucket. 
+File `key` is the private key file which is **not** passphrase protected. File `key.pub` is your public key. 
 
-# To create the image:
+# To create / launch an image 
 
-docker build -f Dockerfile --ssh sshkey=ssh\id_rsa . --tag dpella:devel
+- File `./ghc865.sh` creates / launches a docker images with GHC 8.6.5.
+- File `./latex.sh` creates / launches a docker with texlive in its full version. 
 
-# To run the image:
-
-docker run --rm -it -v $pwd/ssh:/tmp/ssh:ro dpella:devel
+All of the docker images will have a volume associated with it and mounted in `/vol`. 
+This is the directory where you should put all your persisten data. 
 
 # VS Code
 
