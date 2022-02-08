@@ -1,6 +1,8 @@
 # Base the image on Ubuntu 20.04 
 FROM ubuntu:20.04 
 
+VOLUME /code
+
 # Image metadata
 LABEL maintainer="alejandro@dpella.io"
 LABEL version="0.1"
