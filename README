@@ -1,0 +1,16 @@
+
+# SSH Keys:
+
+Create a folder called `ssh` next to the Dockerfile and copy your `id_rsa` and `id_rsa.pub` inside.
+
+# To create the image:
+
+docker build -f Dockerfile --ssh sshkey=ssh\id_rsa . --tag dpella:devel
+
+# To run the image:
+
+docker run --rm -it -v $pwd/ssh:/tmp/ssh:ro dpella:devel
+
+# VS Code
+
+Install the extension "Remote - Containers" to attach the editor to the container.
