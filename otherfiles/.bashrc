@@ -152,4 +152,4 @@ fi
 ## SSH
 eval $(ssh-agent)
 
-ssh-add .ssh/key
+ssh-add /root/.ssh/key
