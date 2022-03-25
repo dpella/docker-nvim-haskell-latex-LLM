@@ -152,4 +152,6 @@ fi
 ## SSH
 eval $(ssh-agent)
 
-ssh-add .ssh/key
+ssh-add /root/.ssh/key
+git config --global user.email "alejandro@dpella.io"
+git config --global user.name "Alejandro Russo"
