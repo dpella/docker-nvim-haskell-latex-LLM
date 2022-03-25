@@ -61,6 +61,10 @@ RUN apt-get update \
     && \ 
     chmod +x /bin/entrypoint
 
+RUN mkdir -p /root/.cabal 
+
+COPY ./otherfiles/config /root/.cabal 
+
 # Move to the root folder
 WORKDIR /root
 
