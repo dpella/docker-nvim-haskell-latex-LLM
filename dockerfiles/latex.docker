@@ -1,5 +1,6 @@
 # Base the image on Ubuntu 20.04 
-FROM ubuntu:20.04 
+#FROM ubuntu:20.04 
+FROM texlive/texlive 
 
 # Image metadata
 LABEL maintainer="alejandro@dpella.io"
@@ -15,8 +16,8 @@ RUN apt-get update
 RUN apt-get install -y --no-install-recommends software-properties-common sudo ssh git wget curl make lzma liblzma-dev zlib1g-dev
 
 # Install latex
-RUN apt-get update
-RUN apt-get install -y texlive-full
+#RUN apt-get update
+#RUN apt-get install -y texlive-full
 
 # Make sure we can clone repos from GitHub via SSH
 RUN mkdir ~/.ssh
