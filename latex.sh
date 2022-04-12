@@ -13,7 +13,7 @@ else
 fi 
 
 # Checking if an associated volume exists 
-docker volume ls | grep ${IMAGE} 
+docker volume ls | grep ${IMAGE} > /dev/null 
 
 if [ $? == 0 ]; then 
 	echo "Volume already exists" 
@@ -22,6 +22,12 @@ else
 	docker volume create ${IMAGE} 
 fi 
 
-echo "Launching the container..."
+# Checking if the container is already up 
+docker container ls | grep ${IMAGE} > /dev/null
 
-docker run --rm -d -it -v $(pwd)/ssh:/tmp/ssh:ro -v ${IMAGE}:/vol ${IMAGE}:devel
+if [ $? == 0 ]; then 
+	echo "Container is already up!" 
+else
+	echo "Launching the container..."
+	docker run --rm -d -it -v $(pwd)/ssh:/tmp/ssh:ro -v ${IMAGE}:/vol ${IMAGE}:devel
+fi
