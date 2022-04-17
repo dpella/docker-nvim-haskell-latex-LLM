@@ -41,6 +41,8 @@ RUN apt-get update \
     && \ 
     apt-get install -y ghc-8.6.5 \
     && \ 
+    apt-get install -y ghc-9.0.1 \
+    && \ 
     update-alternatives --install /usr/bin/cabal cabal /opt/cabal/bin/cabal 20 \
     && \
     update-alternatives --install /usr/bin/ghc-8.6.5 ghc /opt/ghc/bin/ghc 20 \
