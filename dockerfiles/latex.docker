@@ -24,14 +24,8 @@ RUN mkdir ~/.ssh
 RUN touch ~/.ssh/known_hosts
 RUN ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-# Install powerline 
-RUN apt-get install -y powerline  
-
-# Install less
-RUN apt-get install -y less
-
-# Install vim
-RUN apt-get install -y vim
+# Install powerline, less,vim, and lhs2tex 
+RUN apt-get install -y powerline less vim lhs2tex  
 
 # BASHRC for environment variables for GHC and Powerline
 COPY ./otherfiles/.bashrc /root/.bashrc
