@@ -30,26 +30,21 @@ RUN apt-get update \
          curl \ 
          make \ 
          lzma \ 
-         liblzma-dev \ 
+         libnuma-dev \
          zlib1g-dev \
-    && \
-    add-apt-repository ppa:hvr/ghc \
-    && \
-    apt-get update \
-    && \
-    apt-get install -y cabal-install-3.4 \
-    && \ 
-    apt-get install -y ghc-8.6.5 \
-    && \ 
-    apt-get install -y ghc-9.0.1 \
-    && \ 
-    update-alternatives --install /usr/bin/cabal cabal /opt/cabal/bin/cabal 20 \
-    && \
-    update-alternatives --install /usr/bin/ghc-8.6.5 ghc /opt/ghc/bin/ghc 20 \
-    && \ 
-    cabal update \
-    && \ 
-    apt-get install -y powerline \
+	 libgmp-dev \
+	 libgmp10 \
+         liblzma-dev \ 
+	 gcc \
+	 autoconf \
+	 automake \
+	 gpg \
+         dirmngr \
+	 build-essential \
+       	 lsb-release \
+         gnupg2  
+
+RUN apt-get install -y powerline \
     && \  
     apt-get install -y less \
     && \ 
@@ -63,9 +58,33 @@ RUN apt-get update \
     && \ 
     chmod +x /bin/entrypoint
 
+# install gpg keys
+ARG GPG_KEY=7784930957807690A66EBDBE3786C5262ECB4A3F
+RUN gpg --batch --keyserver keys.openpgp.org --recv-keys $GPG_KEY
+
+# install ghcup
+RUN \
+     curl https://downloads.haskell.org/~ghcup/x86_64-linux-ghcup > /usr/bin/ghcup && \
+     chmod +x /usr/bin/ghcup && \
+     ghcup config set gpg-setting GPGStrict
+
 RUN mkdir -p /root/.cabal 
 
 COPY ./otherfiles/config /root/.cabal 
+
+RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
+
+ARG GHC=8.6.5
+ARG CABAL=3.4.0.0
+
+# install GHC and cabal
+RUN \
+    ghcup -v install ghc --force ${GHC} && \
+    ghcup -v install cabal --force ${CABAL}
+
+# install LHS 
+RUN \
+    ghcup install hls 
 
 # Move to the root folder
 WORKDIR /root
