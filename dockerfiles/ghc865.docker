@@ -3,14 +3,12 @@ FROM ubuntu:20.04
 
 # Image metadata
 LABEL maintainer="alejandro@dpella.io"
-LABEL version="0.1"
+LABEL version="0.2"
 LABEL description="GHC for development"
 
 # Set the timezone so apt-get doesn't ask for it later
 ENV TZ=Europe/Stockholm
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-ENV PATH="/opt/ghc/bin:${PATH}"
 
 # BASHRC for environment variables for GHC and Powerline
 COPY ./otherfiles/.bashrc /root/.bashrc
@@ -68,16 +66,13 @@ RUN \
      chmod +x /usr/bin/ghcup && \
      ghcup config set gpg-setting GPGStrict
 
-RUN mkdir -p /root/.cabal 
-
-COPY ./otherfiles/config /root/.cabal 
-
 RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
 
+
+# install GHC and cabal
 ARG GHC=8.6.5
 ARG CABAL=3.4.0.0
 
-# install GHC and cabal
 RUN \
     ghcup -v install ghc --force ${GHC} && \
     ghcup -v install cabal --force ${CABAL}
@@ -85,6 +80,10 @@ RUN \
 # install LHS 
 RUN \
     ghcup install hls 
+
+# Cabal cache in volume
+RUN mkdir -p /root/.cabal 
+COPY ./otherfiles/config /root/.cabal 
 
 # Move to the root folder
 WORKDIR /root
