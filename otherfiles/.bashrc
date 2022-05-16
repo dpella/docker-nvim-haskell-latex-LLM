@@ -143,8 +143,6 @@ if [ -d "/opt/ghc/bin" ] ; then
 	    PATH="/opt/ghc/bin:$PATH"
 fi
 
-alias set-ghc='sudo update-alternatives --config opt-ghc'
-
 if [ -d "$HOME/.cabal/bin" ] ; then
 	    PATH="$HOME/.cabal/bin:$PATH"
 fi
