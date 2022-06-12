@@ -116,13 +116,13 @@ if ! shopt -oq posix; then
   fi
 fi
 
+### CUSTOM CHANGES 
+
 ## Powerline 
 
 if [ -f /usr/share/powerline/bindings/bash/powerline.sh ]; then
    source /usr/share/powerline/bindings/bash/powerline.sh
 fi
-
-### CUSTOM CHANGES 
 
 # set PATH so it includes user's private bin if it exists
 if [ -d "$HOME/bin" ] ; then
