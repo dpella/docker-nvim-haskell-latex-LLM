@@ -1,11 +1,10 @@
-# Base the image on Ubuntu 20.04 
-#FROM ubuntu:20.04 
+# Base image the latest latex suit  
 FROM texlive/texlive 
 
 # Image metadata
-LABEL maintainer="alejandro@dpella.io"
+LABEL maintainer="russo@chalmers.se"
 LABEL version="0.1"
-LABEL description="GHC for development"
+LABEL description="Toolchain to write papers/proposals"
 
 # Set the timezone so apt-get doesn't ask for it later
 ENV TZ=Europe/Stockholm
@@ -13,11 +12,11 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install base system utilities and dependencies
 RUN apt-get update
+
 RUN apt-get install -y --no-install-recommends software-properties-common sudo ssh git wget curl make lzma liblzma-dev zlib1g-dev
 
-# Install latex
-#RUN apt-get update
-#RUN apt-get install -y texlive-full
+# Install lhs2tex
+RUN apt-get install -y lhs2tex  
 
 # Make sure we can clone repos from GitHub via SSH
 RUN mkdir ~/.ssh
