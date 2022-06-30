@@ -147,7 +147,8 @@ if [ -d "$HOME/.cabal/bin" ] ; then
 	    PATH="$HOME/.cabal/bin:$PATH"
 fi
 
-export PATH="~/.ghcup/bin:$PATH"
+export PATH="/root/.ghcup/bin:$PATH"
+ghcup set 8.6.5
 
 ## SSH
 eval $(ssh-agent)
