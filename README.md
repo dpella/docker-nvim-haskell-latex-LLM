@@ -27,3 +27,8 @@ Run the following command inside the `ssh` directory, and just press enter when 
 ```bash
 ssh-keygen -t ed25519 -C <your_email> -f ./key
 ```
+# Where to find the files /vol in Windows 
+
+```
+\\wsl$\docker-desktop-data\version-pack-data\community\docker
+```
