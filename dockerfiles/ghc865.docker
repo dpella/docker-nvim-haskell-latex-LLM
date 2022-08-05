@@ -70,7 +70,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
 
 
 # install GHC and cabal
-ARG GHC=8.6.5
+ARG GHC=8.10.7
 ARG CABAL=3.4.0.0
 
 RUN \
