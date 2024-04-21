@@ -57,8 +57,8 @@ RUN apt-get install -y powerline \
     && \  
     apt-get install -y less \
     && \ 
-    apt-get install -y vim \ 
-    && \
+    # apt-get install -y vim \ 
+    # && \
     mkdir ~/.ssh \ 
     && \
     touch ~/.ssh/known_hosts \
@@ -103,8 +103,18 @@ WORKDIR ${WORKINGDIR}/.fzf
 
 RUN ./install --all  
 
-WORKDIR ${WORKINGDIR}
-
 RUN cat ${WORKINGDIR}/fzf >> ${WORKINGDIR}/.bashrc && rm ${WORKINGDIR}/fzf 
+
+WORKDIR ${WORKINGDIR}
+# NEO Vim 
+
+RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+RUN rm -rf /opt/nvim
+RUN tar -C /opt -xzf nvim-linux64.tar.gz
+RUN rm ${WORKINGDIR}/nvim-linux64.tar.gz
+RUN echo 'export PATH="$PATH:/opt/nvim-linux64/bin"' >> ${WORKINGDIR}/.bashrc
+
+# NChad 
+RUN git clone https://github.com/NvChad/starter ${WORKINGDIR}/.config/nvim
 
 ENTRYPOINT [ "/bin/entrypoint" ]
