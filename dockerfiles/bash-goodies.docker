@@ -76,16 +76,11 @@ RUN apt-get install -y trash-cli
 # TL;DR
 RUN apt-get install --yes tldr
 
-# Fuzzy find filer
-RUN apt-get install --yes fzf
-RUN git clone --depth 1 https://github.com/junegunn/fzf.git ${WORKINGDIR}/.fzf
-RUN cat ${WORKINGDIR}/fzf >> ${WORKINGDIR}/.bashrc && rm ${WORKINGDIR}/fzf 
-
 # Batcat (improved cat)
 RUN apt-get install --yes bat
 
 # Weather in ASCII :)
-RUN echo -e "\n weather() { curl wttr.in/$@; }" >> ${WORKINGDIR}/.bashrc
+RUN echo "weather() { curl wttr.in/$@; }" >> ${WORKINGDIR}/.bashrc
 
 # Activate powerline 
 RUN cat ${WORKINGDIR}/powerline >> ${WORKINGDIR}/.bashrc && rm ${WORKINGDIR}/powerline 
@@ -94,7 +89,22 @@ RUN cat ${WORKINGDIR}/powerline >> ${WORKINGDIR}/.bashrc && rm ${WORKINGDIR}/pow
 RUN mv ${WORKINGDIR}/default.twolines.json /usr/share/powerline/config_files/themes/shell
 RUN sed -i 's/default_leftonly/default.twolines/g' /usr/share/powerline/config_files/config.json
 
-# Move to the root folder
+RUN echo "alias less=batcat" >> ${WORKINGDIR}/.bashrc 
+RUN echo 'eval $(ssh-agent)' >> ${WORKINGDIR}/.bashrc
+
+# Installing yes 
+RUN apt-get install coreutils 
+
+# Fuzzy find filer
+# RUN apt-get install --yes fzf
+RUN git clone --depth 1 https://github.com/junegunn/fzf.git ${WORKINGDIR}/.fzf
+
+WORKDIR ${WORKINGDIR}/.fzf
+
+RUN ./install --all  
+
 WORKDIR ${WORKINGDIR}
+
+RUN cat ${WORKINGDIR}/fzf >> ${WORKINGDIR}/.bashrc && rm ${WORKINGDIR}/fzf 
 
 ENTRYPOINT [ "/bin/entrypoint" ]
