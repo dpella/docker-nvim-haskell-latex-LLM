@@ -1,0 +1,5 @@
+# To preview text files
+export FZF_DEFAULT_OPTS="--preview 'batcat --color=always {} | head -500'"
+# Autocompletion with fzf using ** and then <TAB>
+[ -f ~/.fzf/shell/completion.bash ] && source ~/.fzf/shell/completion.bash
+[ -f ~/.fzf/shell/key-bindings.bash ] && source ~/.fzf/shell/key-bindings.bash
