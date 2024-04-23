@@ -125,7 +125,7 @@ RUN git clone https://github.com/NvChad/starter ${WORKINGDIR}/.config/nvim
 RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
 
 # Add ghcup to the PATH
-ENV PATH="/root/.ghcup/bin:$PATH"
+ENV PATH="${WORKINGDIR}/.ghcup/bin:$PATH"
 
 RUN ghcup install ghc 9.6.4
 RUN ghcup set ghc 9.6.4
@@ -154,10 +154,19 @@ RUN luarocks install luasocket
 
 WORKDIR ${WORKINGDIR}
 
-RUN rm -r luarocks-3.11.0
+RUN rm -r luarocks-3.11.0.tar.gz luarocks-3.11.0
 
+# Installing Haskell tools for Neo Vim
 RUN luarocks install haskell-tools.nvim
 
-COPY ./otherfiles/init.lua ${WORKINGDIR}/.config/nvim/lua/plugins/
+# Hoogle for Haskell tools
+RUN cabal install hoogle
+
+ENV PATH=$PATH:${WORKINGDIR}/.cabal/bin
+
+RUN hoogle generate
+
+COPY ./otherfiles/init.lua    ${WORKINGDIR}/.config/nvim/lua/plugins/
+COPY ./otherfiles/options.lua ${WORKINGDIR}/.config/nvim/lua/
 
 ENTRYPOINT [ "/bin/entrypoint" ]
