@@ -158,4 +158,6 @@ RUN rm -r luarocks-3.11.0
 
 RUN luarocks install haskell-tools.nvim
 
+COPY ./otherfiles/init.lua ${WORKINGDIR}/.config/nvim/lua/plugins/
+
 ENTRYPOINT [ "/bin/entrypoint" ]
