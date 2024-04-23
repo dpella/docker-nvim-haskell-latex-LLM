@@ -166,6 +166,9 @@ ENV PATH=$PATH:${WORKINGDIR}/.cabal/bin
 
 RUN hoogle generate
 
+# Fast-tag for Haskell files 
+RUN cabal install fast-tags 
+
 COPY ./otherfiles/init.lua    ${WORKINGDIR}/.config/nvim/lua/plugins/
 COPY ./otherfiles/options.lua ${WORKINGDIR}/.config/nvim/lua/
 
