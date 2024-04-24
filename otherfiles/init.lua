@@ -6,11 +6,12 @@ return {
       require "configs.conform"
     end,
   },
+
   {
     "mrcjkb/haskell-tools.nvim",
     version = '^3', -- Recommended
     lazy = false, -- This plugin is already lazy
-  }, 
+  },
   -- These are some examples, uncomment them if you want to see them work!
   -- {
   --   "neovim/nvim-lspconfig",
@@ -20,16 +21,16 @@ return {
   --   end,
   -- },
   --
-  -- {
-  -- 	"williamboman/mason.nvim",
-  -- 	opts = {
-  -- 		ensure_installed = {
-  -- 			"lua-language-server", "stylua",
-  -- 			"html-lsp", "css-lsp" , "prettier"
-  -- 		},
-  -- 	},
-  -- },
-  --
+  {
+  	"williamboman/mason.nvim",
+  	opts = {
+  		ensure_installed = {
+  			"lua-language-server",
+  			-- "haskell-debuger-adapter"
+  		},
+  	},
+  },
+
   -- {
   -- 	"nvim-treesitter/nvim-treesitter",
   -- 	opts = {

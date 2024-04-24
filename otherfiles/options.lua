@@ -4,6 +4,9 @@ require "nvchad.options"
 
 local o = vim.o
 
+-- Display line numbers
+o.number = true  
+
 -- Bash as terminal
 o.shell="/usr/bin/bash"
 
@@ -15,9 +18,6 @@ o.incsearch = true
 
 -- Reads files again if they have been changed outside of vim
 o.autoread = true 
-
--- Display line numbers
-o.number = true  
 
 -- To enable cursorline
 o.cursorlineopt = 'both' 
