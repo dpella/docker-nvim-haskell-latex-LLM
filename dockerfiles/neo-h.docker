@@ -169,9 +169,6 @@ RUN hoogle generate
 # Fast-tag for Haskell files 
 RUN cabal install fast-tags 
 
-COPY ./otherfiles/init.lua    ${WORKINGDIR}/.config/nvim/lua/plugins/
-COPY ./otherfiles/options.lua ${WORKINGDIR}/.config/nvim/lua/
-
 # Locale 
 RUN apt install locales
 RUN locale-gen en_US.UTF-8
@@ -182,6 +179,13 @@ ENV LANG=en_US.UTF-8
 RUN apt-get install -y cargo
 RUN cargo install tree-sitter-cli
 ENV PATH="${WORKINGDIR}/.cargo/bin:$PATH"
-RUN apt-get install nodejs
+
+RUN apt-get install -y nodejs
+
+# For telescope (nvim) to grep in all the files
+RUN apt-get install ripgrep
+
+COPY ./otherfiles/init.lua    ${WORKINGDIR}/.config/nvim/lua/plugins/
+COPY ./otherfiles/options.lua ${WORKINGDIR}/.config/nvim/lua/
 
 ENTRYPOINT [ "/bin/entrypoint" ]
