@@ -185,6 +185,9 @@ RUN apt-get install -y nodejs
 # For telescope (nvim) to grep in all the files
 RUN apt-get install ripgrep
 
+# Formatting Haskell
+# RUN cabal install ormolu
+
 COPY ./otherfiles/init.lua    ${WORKINGDIR}/.config/nvim/lua/plugins/
 COPY ./otherfiles/options.lua ${WORKINGDIR}/.config/nvim/lua/
 
