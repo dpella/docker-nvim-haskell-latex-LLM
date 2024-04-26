@@ -4,43 +4,26 @@ require "nvchad.options"
 
 local o = vim.o
 
--- Display line numbers
-o.number = true   
-
--- Relative numbers to jump easily
-o.relativenumber = true 
-
 -- Bash as terminal
 o.shell="/usr/bin/bash"
 
 -- Highlight search matches
-o.hlsearch = true 
+o.hlsearch = true
 
 -- Starts search before enter
-o.incsearch = true  
+o.incsearch = true
 
 -- Reads files again if they have been changed outside of vim
-o.autoread = true 
-
--- To enable cursorline
-o.cursorline = true   
+o.autoread = true
 
 -- UTF-8
 o.encoding = "utf-8"
 
 -- Identation 
-o.smartindent = true 
-o.autoindent  = true 
-o.copyindent  = true 
-o.shiftround  = true 
+o.smartindent = true
+o.autoindent  = true
+o.copyindent  = true
+o.shiftround  = true
 
--- Ignore case in searches/replaces, except if they contain uppercase letters.
-o.smartcase = true 
-o.ignorecase = true 
 
--- Spaces and tabs 
-o.tabstop = 2 
-o.softtabstop = 2 
-o.shiftwidth = 2 
-o.expandtab = true 
 
