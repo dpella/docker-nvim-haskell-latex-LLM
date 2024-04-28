@@ -188,8 +188,9 @@ RUN apt-get install ripgrep
 # Formatting Haskell
 # RUN cabal install ormolu
 
-COPY ./otherfiles/init.lua    ${WORKINGDIR}/.config/nvim/lua/plugins/
-COPY ./otherfiles/options.lua ${WORKINGDIR}/.config/nvim/lua/
-COPY ./otherfiles/conform.lua ${WORKINGDIR}/.config/nvim/lua/configs/
+COPY ./otherfiles/init.lua     ${WORKINGDIR}/.config/nvim/lua/plugins/
+COPY ./otherfiles/options.lua  ${WORKINGDIR}/.config/nvim/lua/
+COPY ./otherfiles/mappings.lua ${WORKINGDIR}/.config/nvim/lua/
+COPY ./otherfiles/conform.lua  ${WORKINGDIR}/.config/nvim/lua/configs/
 
 ENTRYPOINT [ "/bin/entrypoint" ]
