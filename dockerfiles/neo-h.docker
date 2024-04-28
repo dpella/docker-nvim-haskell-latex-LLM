@@ -190,5 +190,6 @@ RUN apt-get install ripgrep
 
 COPY ./otherfiles/init.lua    ${WORKINGDIR}/.config/nvim/lua/plugins/
 COPY ./otherfiles/options.lua ${WORKINGDIR}/.config/nvim/lua/
+COPY ./otherfiles/conform.lua ${WORKINGDIR}/.config/nvim/lua/configs/
 
 ENTRYPOINT [ "/bin/entrypoint" ]
