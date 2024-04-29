@@ -7,23 +7,57 @@ return {
     end,
   },
 
-  -- Installing Haskell tools
   {
-    "mrcjkb/haskell-tools.nvim",
-    version = "^3", -- Recommended
-    lazy = false, -- This plugin is already lazy
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      ensure_installed = {
+        -- defaults
+        "vim",
+        "lua",
+        "vimdoc",
+        "haskell",
+
+        -- web dev
+        "html",
+        "css",
+        "javascript",
+        "typescript",
+        "tsx",
+
+        -- low level
+        "c",
+        "zig",
+      },
+    },
   },
 
   -- It describes what to install when running :MasonInstallAll
   {
     "williamboman/mason.nvim",
-    opts = {
-      ensure_installed = {
-        "lua-language-server",
-        "stylua", -- Lua identation
-        "ormolu", -- Haskell identation
-      },
-    },
+    dependencies = { "williamboman/mason-lspconfig.nvim" },
+    config = function()
+      local mason = require "mason"
+      local mason_lspconfig = require "mason-lspconfig"
+
+      mason.setup()
+
+      mason_lspconfig.setup {
+        ensure_installed = {
+          "lua_ls", -- Lua
+          "hls", -- Haskell
+        },
+        automatic_instalation = true,
+      }
+    end,
+  },
+
+  -- These are some examples, uncomment them if you want to see them work!
+  {
+    "neovim/nvim-lspconfig",
+    config = function()
+      require("nvchad.configs.lspconfig").defaults()
+      require "configs.lspconfig"
+    end,
   },
 
   -- Maximizes a split for a moment

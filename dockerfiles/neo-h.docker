@@ -57,8 +57,6 @@ RUN apt-get install -y powerline \
     && \  
     apt-get install -y less \
     && \ 
-    # apt-get install -y vim \ 
-    # && \
     mkdir ~/.ssh \ 
     && \
     touch ~/.ssh/known_hosts \
@@ -96,7 +94,6 @@ RUN echo 'eval $(ssh-agent)' >> ${WORKINGDIR}/.bashrc
 RUN apt-get install coreutils 
 
 # Fuzzy find filer
-# RUN apt-get install --yes fzf
 RUN git clone --depth 1 https://github.com/junegunn/fzf.git ${WORKINGDIR}/.fzf
 
 WORKDIR ${WORKINGDIR}/.fzf
@@ -144,27 +141,9 @@ RUN ghcup set hls
 RUN apt-get install -y lua5.4 
 RUN apt-get install -y lua5.4-dev 
 RUN apt-get install -y unzip 
-RUN wget https://luarocks.org/releases/luarocks-3.11.0.tar.gz
-RUN tar zxpf luarocks-3.11.0.tar.gz
- 
-WORKDIR luarocks-3.11.0
 
-RUN ./configure && make && make install
-RUN luarocks install luasocket
-
-WORKDIR ${WORKINGDIR}
-
-RUN rm -r luarocks-3.11.0.tar.gz luarocks-3.11.0
-
-# Installing Haskell tools for Neo Vim
-RUN luarocks install haskell-tools.nvim
-
-# Hoogle for Haskell tools
-RUN cabal install hoogle
 
 ENV PATH=$PATH:${WORKINGDIR}/.cabal/bin
-
-RUN hoogle generate
 
 # Fast-tag for Haskell files 
 RUN cabal install fast-tags 
@@ -185,12 +164,11 @@ RUN apt-get install -y nodejs
 # For telescope (nvim) to grep in all the files
 RUN apt-get install ripgrep
 
-# Formatting Haskell
-# RUN cabal install ormolu
-
-COPY ./otherfiles/init.lua     ${WORKINGDIR}/.config/nvim/lua/plugins/
-COPY ./otherfiles/options.lua  ${WORKINGDIR}/.config/nvim/lua/
-COPY ./otherfiles/mappings.lua ${WORKINGDIR}/.config/nvim/lua/
-COPY ./otherfiles/conform.lua  ${WORKINGDIR}/.config/nvim/lua/configs/
+COPY ./otherfiles/top-init.lua   ${WORKINGDIR}/.config/nvim/init.lua
+COPY ./otherfiles/init.lua       ${WORKINGDIR}/.config/nvim/lua/plugins/
+COPY ./otherfiles/options.lua    ${WORKINGDIR}/.config/nvim/lua/
+COPY ./otherfiles/mappings.lua   ${WORKINGDIR}/.config/nvim/lua/
+COPY ./otherfiles/conform.lua    ${WORKINGDIR}/.config/nvim/lua/configs/
+COPY ./otherfiles/lspconfig.lua  ${WORKINGDIR}/.config/nvim/lua/configs/
 
 ENTRYPOINT [ "/bin/entrypoint" ]
