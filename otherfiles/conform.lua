@@ -2,6 +2,7 @@ local options = {
   formatters_by_ft = {
     lua = { "stylua" },
     haskell = { "ormolu" },
+    markdown = { "prettier" },
     -- css = { "prettier" },
     -- html = { "prettier" },
   },

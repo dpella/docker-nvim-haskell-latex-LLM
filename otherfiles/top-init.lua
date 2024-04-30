@@ -43,12 +43,19 @@ local mr = require "mason-registry"
 -- Auto-install Mason Pretty Printers
 vim.api.nvim_create_autocmd("VimEnter", {
   callback = function()
+    -- Lua
     if not mr.is_installed "stylua" then
       vim.cmd "MasonInstall stylua"
     end
 
+    -- Haskell
     if not mr.is_installed "ormolu" then
       vim.cmd "MasonInstall ormolu"
+    end
+
+    -- Markdown
+    if not mr.is_installed "prettier" then
+      vim.cmd "MasonInstall prettier@2.8.8"
     end
 
     -- vim.cmd "TSInstall haskell"

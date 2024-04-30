@@ -16,6 +16,7 @@ return {
         "lua",
         "vimdoc",
         "haskell",
+        "markdown",
 
         -- web dev
         "html",
@@ -45,6 +46,7 @@ return {
         ensure_installed = {
           "lua_ls", -- Lua
           "hls", -- Haskell
+          "marksman", -- Markdown
         },
         automatic_instalation = true,
       }
