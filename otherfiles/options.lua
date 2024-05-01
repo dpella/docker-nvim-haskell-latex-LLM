@@ -5,7 +5,10 @@ require "nvchad.options"
 local o = vim.o
 
 -- Bash as terminal
-o.shell="/usr/bin/bash"
+o.shell = "/usr/bin/bash"
+
+-- Cursor line
+o.cursorline = true
 
 -- Highlight search matches
 o.hlsearch = true
@@ -19,11 +22,8 @@ o.autoread = true
 -- UTF-8
 o.encoding = "utf-8"
 
--- Identation 
+-- Identation
 o.smartindent = true
-o.autoindent  = true
-o.copyindent  = true
-o.shiftround  = true
-
-
-
+o.autoindent = true
+o.copyindent = true
+o.shiftround = true
