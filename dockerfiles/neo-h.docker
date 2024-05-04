@@ -174,4 +174,7 @@ COPY ./otherfiles/chadrc.lua     ${WORKINGDIR}/.config/nvim/lua/
 COPY ./otherfiles/conform.lua    ${WORKINGDIR}/.config/nvim/lua/configs/
 COPY ./otherfiles/lspconfig.lua  ${WORKINGDIR}/.config/nvim/lua/configs/
 
+# File format options for Haskell code 
+COPY ./otherfiles/fourmolu.yaml  ${WORKINGDIR}
+
 ENTRYPOINT [ "/bin/entrypoint" ]

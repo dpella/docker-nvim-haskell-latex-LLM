@@ -49,8 +49,8 @@ vim.api.nvim_create_autocmd("VimEnter", {
     end
 
     -- Haskell
-    if not mr.is_installed "ormolu" then
-      vim.cmd "MasonInstall ormolu"
+    if not mr.is_installed "fourmolu" then
+      vim.cmd "MasonInstall fourmolu"
     end
 
     -- Markdown
