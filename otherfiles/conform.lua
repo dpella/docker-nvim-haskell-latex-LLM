@@ -1,7 +1,8 @@
 local options = {
   formatters_by_ft = {
     lua = { "stylua" },
-    haskell = { "ormolu" },
+    haskell = { "fourmolu" },
+    markdown = { "prettier" },
     -- css = { "prettier" },
     -- html = { "prettier" },
   },
