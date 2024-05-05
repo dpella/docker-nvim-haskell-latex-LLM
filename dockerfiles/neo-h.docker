@@ -132,14 +132,15 @@ RUN ghcup install cabal 3.10.1.0
 RUN ghcup set cabal 3.10.1.0
 
 # Install Haskell Language Server
-RUN ghcup install hls
+# RUN ghcup install hls
 
 # Set the installed version of hls as the default
-RUN ghcup set hls
+# RUN ghcup set hls
 
 # LuaRocks (needed for Haskell tools) 
-RUN apt-get install -y lua5.4 
-RUN apt-get install -y lua5.4-dev 
+# RUN apt-get install -y lua5.4 
+# RUN apt-get install -y lua5.4-dev 
+
 RUN apt-get install -y unzip 
 
 
