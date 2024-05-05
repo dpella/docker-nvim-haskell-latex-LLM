@@ -110,4 +110,15 @@ return {
     version = "*",
     config = true,
   },
+
+  -- Sessions
+  {
+    "Shatur/neovim-session-manager",
+    event = "VimEnter",
+    config = function()
+      require("session_manager").setup {
+        autoload_mode = require("session_manager.config").AutoloadMode.Disabled, -- CurrentDir,
+      }
+    end,
+  },
 }

@@ -9,6 +9,8 @@ map("i", "jk", "<ESC>")
 
 -- map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>")
 
+map("n", "<leader>z", "<cmd> SessionManager <CR>", { desc = "Session manager" })
+
 -- Auto-indent
 local conform = require "conform"
 
