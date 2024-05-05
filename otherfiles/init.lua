@@ -17,6 +17,7 @@ return {
         "vimdoc",
         "haskell",
         "markdown",
+        "latex",
 
         -- web dev
         "html",
@@ -47,6 +48,7 @@ return {
           "lua_ls", -- Lua
           "hls", -- Haskell
           "marksman", -- Markdown
+          "texlab", -- Latex
         },
         automatic_instalation = true,
       }
@@ -119,6 +121,24 @@ return {
       require("session_manager").setup {
         autoload_mode = require("session_manager.config").AutoloadMode.Disabled, -- CurrentDir,
       }
+    end,
+  },
+
+  -- Latex
+  {
+    "lervag/vimtex",
+    ft = { "tex" },
+    init = function()
+      vim.g.tex_flavor = "latex"
+      -- vim.g.vimtex_quickfix_mode = 0
+      -- vim.g.vimtex_mappings_enabled = 0
+      -- vim.g.vimtex_indent_enabled = 0
+      --
+      vim.g.vimtex_view_method = "zathura"
+      vim.g.vimtex_context_pdf_viewer = "zathura"
+
+      -- For xelatex: add the following line at the beginning of the file
+      -- %!TEX TS-program = xelatex
     end,
   },
 }

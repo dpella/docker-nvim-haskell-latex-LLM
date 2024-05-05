@@ -131,18 +131,8 @@ RUN ghcup set ghc 9.6.4
 RUN ghcup install cabal 3.10.1.0
 RUN ghcup set cabal 3.10.1.0
 
-# Install Haskell Language Server
-# RUN ghcup install hls
-
-# Set the installed version of hls as the default
-# RUN ghcup set hls
-
-# LuaRocks (needed for Haskell tools) 
-# RUN apt-get install -y lua5.4 
-# RUN apt-get install -y lua5.4-dev 
-
+# For one of the plugins
 RUN apt-get install -y unzip 
-
 
 ENV PATH=$PATH:${WORKINGDIR}/.cabal/bin
 
@@ -166,6 +156,21 @@ RUN apt-get install -y npm
 
 # For telescope (nvim) to grep in all the files
 RUN apt-get install ripgrep
+
+# For latex 
+RUN apt-get install -y texlive-xetex  # Xelatex 
+RUN apt-get install -y zathura        # Visualizer 
+RUN apt-get install -y latexmk        # Latexmk 
+RUN apt-get install -y texlive-luatex # Fonts
+
+# Installing fonts (like Times New Roman)
+
+# Accepting the license 
+RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
+# Downloading and installing the fonts 
+RUN apt-get install -y ttf-mscorefonts-installer
+# Extra packages I use 
+RUN apt-get install -y texlive-science 
 
 COPY ./otherfiles/top-init.lua   ${WORKINGDIR}/.config/nvim/init.lua
 COPY ./otherfiles/init.lua       ${WORKINGDIR}/.config/nvim/lua/plugins/
