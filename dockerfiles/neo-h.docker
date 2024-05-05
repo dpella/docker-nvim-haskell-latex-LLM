@@ -171,6 +171,7 @@ RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula selec
 RUN apt-get install -y ttf-mscorefonts-installer
 # Extra packages I use 
 RUN apt-get install -y texlive-science 
+RUN apt-get install -y texlive-extra-utils # texcount and others 
 
 COPY ./otherfiles/top-init.lua   ${WORKINGDIR}/.config/nvim/init.lua
 COPY ./otherfiles/init.lua       ${WORKINGDIR}/.config/nvim/lua/plugins/
