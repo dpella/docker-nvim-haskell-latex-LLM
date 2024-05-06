@@ -50,6 +50,17 @@ fi
 
 echo "Launching the container..."
 
-docker run --rm -d -it -v $(pwd)/ssh:/tmp/ssh:ro -v ${IMAGE}:/vol ${IMAGE}:devel
+docker run --rm \
+	   -d   \
+           -it  \
+	   -v $(pwd)/ssh:/tmp/ssh:ro \
+	   -v ${IMAGE}:/vol  \
+           -v /tmp/.X11-unix:/tmp/.X11-unix \
+           -v /mnt/wslg:/mnt/wslg \
+           -e DISPLAY \
+           -e WAYLAND_DISPLAY \
+           -e XDG_RUNTIME_DIR \
+           -e PULSE_SERVER \
+           ${IMAGE}:devel
 
 
