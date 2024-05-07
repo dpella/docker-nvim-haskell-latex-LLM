@@ -64,18 +64,44 @@ RUN apt-get install -y powerline \
     ssh-keyscan github.com >> ~/.ssh/known_hosts \ 
     && \ 
     chmod +x /bin/entrypoint
+
 ##
-# Utilities
+# Utilities required by neo-vim plugins
 ## 
 
-# Trash can 
-RUN apt-get install -y trash-cli 
- 
-# TL;DR
-RUN apt-get install --yes tldr
+RUN apt-get install -y \
+	trash-cli \
+    tldr \
+    bat \
+	coreutils \
+	unzip \
+	cargo \
+	locales \
+	nodejs \
+	npm \
+	ripgrep \
+	dbus-x11
 
-# Batcat (improved cat)
-RUN apt-get install --yes bat
+##
+# Latex 
+## 
+
+# Accepting the license 
+RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
+
+RUN apt-get install -y \
+    texlive-xetex \
+	zathura \
+	latexmk \
+	texlive-luatex \
+	ttf-mscorefonts-installer \
+	texlive-science \
+	texlive-extra-utils 
+
+
+##
+# Configuration of terminal 
+## 
 
 # Weather in ASCII :)
 RUN echo "weather() { curl wttr.in/$@; }" >> ${WORKINGDIR}/.bashrc
@@ -90,8 +116,6 @@ RUN sed -i 's/default_leftonly/default.twolines/g' /usr/share/powerline/config_f
 RUN echo "alias less=batcat" >> ${WORKINGDIR}/.bashrc 
 RUN echo 'eval $(ssh-agent)' >> ${WORKINGDIR}/.bashrc
 
-# Installing yes 
-RUN apt-get install coreutils 
 
 # Fuzzy find filer
 RUN git clone --depth 1 https://github.com/junegunn/fzf.git ${WORKINGDIR}/.fzf
@@ -107,6 +131,7 @@ WORKDIR ${WORKINGDIR}
 ## 
 # NEO Vim 
 ##
+
 RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
 RUN rm -rf /opt/nvim
 RUN tar -C /opt -xzf nvim-linux64.tar.gz
@@ -115,6 +140,24 @@ RUN echo 'export PATH="$PATH:/opt/nvim-linux64/bin"' >> ${WORKINGDIR}/.bashrc
 
 # NVChad (IDE based on NeoVIM) 
 RUN git clone https://github.com/NvChad/starter ${WORKINGDIR}/.config/nvim
+
+# Tree-sitter (parsers)
+RUN cargo install tree-sitter-cli
+ENV PATH="${WORKINGDIR}/.cargo/bin:$PATH"
+
+# Locale 
+RUN locale-gen en_US.UTF-8
+RUN update-locale
+ENV LANG=en_US.UTF-8
+
+# Configuration for NvChad 
+COPY ./otherfiles/top-init.lua   ${WORKINGDIR}/.config/nvim/init.lua
+COPY ./otherfiles/init.lua       ${WORKINGDIR}/.config/nvim/lua/plugins/
+COPY ./otherfiles/options.lua    ${WORKINGDIR}/.config/nvim/lua/
+COPY ./otherfiles/mappings.lua   ${WORKINGDIR}/.config/nvim/lua/
+COPY ./otherfiles/chadrc.lua     ${WORKINGDIR}/.config/nvim/lua/
+COPY ./otherfiles/conform.lua    ${WORKINGDIR}/.config/nvim/lua/configs/
+COPY ./otherfiles/lspconfig.lua  ${WORKINGDIR}/.config/nvim/lua/configs/
 
 ## 
 # Haskell
@@ -131,57 +174,10 @@ RUN ghcup set ghc 9.6.4
 RUN ghcup install cabal 3.10.1.0
 RUN ghcup set cabal 3.10.1.0
 
-# For one of the plugins
-RUN apt-get install -y unzip 
-
 ENV PATH=$PATH:${WORKINGDIR}/.cabal/bin
 
 # Fast-tag for Haskell files 
 RUN cabal install fast-tags 
-
-# Locale 
-RUN apt install locales
-RUN locale-gen en_US.UTF-8
-RUN update-locale
-ENV LANG=en_US.UTF-8
-
-# Tree-sitter (parsers)
-RUN apt-get install -y cargo
-RUN cargo install tree-sitter-cli
-ENV PATH="${WORKINGDIR}/.cargo/bin:$PATH"
-
-# Required by prettier formatter 
-RUN apt-get install -y nodejs
-RUN apt-get install -y npm 
-
-# For telescope (nvim) to grep in all the files
-RUN apt-get install ripgrep
-
-# For latex 
-RUN apt-get install -y texlive-xetex  # Xelatex 
-RUN apt-get install -y zathura        # Visualizer 
-RUN apt-get install -y latexmk        # Latexmk 
-RUN apt-get install -y texlive-luatex # Fonts
-
-# Installing fonts (like Times New Roman)
-
-# Accepting the license 
-RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
-# Downloading and installing the fonts 
-RUN apt-get install -y ttf-mscorefonts-installer
-# Extra packages I use 
-RUN apt-get install -y texlive-science 
-RUN apt-get install -y texlive-extra-utils # texcount and others 
-# To visualize PDFs from NeoVim 
-RUN apt-get install -y dbus-x11
-
-COPY ./otherfiles/top-init.lua   ${WORKINGDIR}/.config/nvim/init.lua
-COPY ./otherfiles/init.lua       ${WORKINGDIR}/.config/nvim/lua/plugins/
-COPY ./otherfiles/options.lua    ${WORKINGDIR}/.config/nvim/lua/
-COPY ./otherfiles/mappings.lua   ${WORKINGDIR}/.config/nvim/lua/
-COPY ./otherfiles/chadrc.lua     ${WORKINGDIR}/.config/nvim/lua/
-COPY ./otherfiles/conform.lua    ${WORKINGDIR}/.config/nvim/lua/configs/
-COPY ./otherfiles/lspconfig.lua  ${WORKINGDIR}/.config/nvim/lua/configs/
 
 # File format options for Haskell code 
 COPY ./otherfiles/fourmolu.yaml  ${WORKINGDIR}
