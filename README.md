@@ -37,6 +37,15 @@ Run the following command inside the `ssh` directory, and just press enter when 
 ssh-keygen -t ed25519 -C <your_email> -f ./key
 ```
 Don't forget to upload the public keys to Github or Bitbucket. 
+ 
+## Git 
+
+In file `./dockerfiles/neo-h.docker`, change the following lines with your name and email address. 
+
+```bash
+RUN echo 'git config --global user.name "Alejandro Russo"' >> ${WORKINGDIR}/.bashrc
+RUN echo 'git config --global user.email alejandro@dpella.io' >> ${WORKINGDIR}/.bashrc
+```
 
 # Launch 
 
