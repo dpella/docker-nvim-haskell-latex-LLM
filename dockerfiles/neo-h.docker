@@ -89,6 +89,8 @@ RUN apt-get install -y \
 # Accepting the license 
 RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
 
+RUN apt-get update # For some reason, it needs this for Latex
+
 RUN apt-get install -y \
 	texlive-xetex \
 	zathura \
@@ -197,5 +199,6 @@ RUN cat cmd | /bin/sh
 RUN tar xf lazygit.tar.gz lazygit
 RUN install lazygit /usr/local/bin
 RUN rm -f cmd lazygit lazygit.tar.gz version
+
 
 ENTRYPOINT [ "/bin/entrypoint" ]
