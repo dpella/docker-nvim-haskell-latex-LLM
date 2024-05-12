@@ -96,7 +96,8 @@ RUN apt-get install -y \
 	texlive-luatex \
 	ttf-mscorefonts-installer \
 	texlive-science \
-	texlive-extra-utils 
+	texlive-extra-utils \
+	texlive-bibtex-extra
 
 
 ##

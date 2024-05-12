@@ -136,7 +136,11 @@ return {
       --
       vim.g.vimtex_view_method = "zathura"
       vim.g.vimtex_context_pdf_viewer = "zathura"
-
+      vim.g.vimtex_compiler_latexmk = {
+        options = {
+          "-shell-escape",
+        },
+      }
       -- For xelatex: add the following line at the beginning of the file
       -- %!TEX TS-program = xelatex
     end,
