@@ -182,4 +182,9 @@ RUN cabal install fast-tags
 # File format options for Haskell code 
 COPY ./otherfiles/fourmolu.yaml  ${WORKINGDIR}
 
+## Config GIT 
+RUN echo '/usr/bin/ssh-add /root/.ssh/key' >> ${WORKINGDIR}/.bashrc
+RUN echo 'git config --global user.name "Alejandro Russo"' >> ${WORKINGDIR}/.bashrc
+RUN echo 'git config --global user.email alejandro@dpella.io' >> ${WORKINGDIR}/.bashrc
+
 ENTRYPOINT [ "/bin/entrypoint" ]
