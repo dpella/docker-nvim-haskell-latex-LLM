@@ -1,52 +1,62 @@
-# Repository to create docker images
+# NvChad Customization 
 
-- GHC 8.6.5
-- Latex (all packages)
+This repository builds a docker image of NvChad -- a customization of Neo Vim. 
 
-# SSH Keys:
+You have all of NvChad with the addition of severals plugins and configurations to:
 
-Once you clone this repo, you should get into `ssh` and add your private / public keys to connect to Github or Bitbucket.
-File `key` is the private key file which is **not** passphrase protected. File `key.pub` is your public key.
+- Develop in Haskell (language server) 
+- Write markdown documents (language server) 
+- Write, compile, and visualize Latex documents (`<leader> cl`)
+- Manage repositories and commits (Lazygit, `<leager gg>`)
+- Welcome screen of DPella (the company where I work)
 
-# To create / launch an image
+It also supports: 
 
-- File `./ghc865.sh` creates / launches a docker images with GHC 8.6.5.
-- File `./latex.sh` creates / launches a docker with texlive in its full version.
+- keeping tracks of comments of the form `TODO:`, `HACK:`, and `BUG:` (`]t` and
+  `[t` for next an prev comment)
+- save and restore sessions (`<leader> z`)
 
 All of the docker images will have a volume associated with it and mounted in `/vol`.
 This is the directory where you should put all your persisten data.
 
-# VS Code
+# Configuration 
 
-Install the extension "Remote - Containers" to attach the editor to the container.
+## SSH Keys:
 
-## Fonts formatting
-- In windows, install a font compatible with Powerline. This setup has been
-  tested with [Menlo for Powerline](https://github.com/abertsch/Menlo-for-Powerline)
-  and [JetBrains Mono](https://www.jetbrains.com/lp/mono/)
+Once you clone this repo, you should get into `ssh` and add your private /
+public keys to connect to Github or Bitbucket.
 
-- Set VS Code editor's font to the one you have installed. Typically it can be
-  done by navigating to `File > Preferences > Settings`, searching for `editor
-  font family` and adding the desired font to the list.
+File `key` is the private key file which is **not** passphrase protected. File
+`key.pub` is your public key.
 
-# To create a key
+## To create a key
 
 Run the following command inside the `ssh` directory, and just press enter when asked for a password.
 
 ```bash
 ssh-keygen -t ed25519 -C <your_email> -f ./key
 ```
-# Where to find the files /vol in Windows
+Don't forget to upload the public keys to Github or Bitbucket. 
 
-- Docker v19
+# Launch 
 
-```
-\\wsl$\docker-desktop-data\version-pack-data\community\docker
-```
-
-- Docker v20
-```
-\\wsl$\docker-desktop-data\data\docker\volumes
+```bash
+./launch neo-h
 ```
 
-Note: You can find the directory by typing `\\wsl$` in windows file manager.
+If the image does not exist, it will create it and launch the container. If the image exits, 
+it will launch it inside a container. 
+
+After the image is launched, simply type
+
+```bash 
+docker attach <4 first letters of the container created>
+```
+
+Once inside the container, type 
+
+```bash 
+nvim 
+```
+
+Enjoy! 
