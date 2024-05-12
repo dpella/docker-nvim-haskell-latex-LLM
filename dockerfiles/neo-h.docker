@@ -90,7 +90,7 @@ RUN apt-get install -y \
 RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
 
 RUN apt-get install -y \
-    texlive-xetex \
+	texlive-xetex \
 	zathura \
 	latexmk \
 	texlive-luatex \
