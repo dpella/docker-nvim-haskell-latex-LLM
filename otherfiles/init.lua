@@ -144,15 +144,12 @@ return {
 
   -- Git
   {
-    "NeogitOrg/neogit",
+    "kdheepak/lazygit.nvim",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "sindrets/diffview.nvim",
-      "nvim-telescope/telescope.nvim",
     },
-    config = true,
     keys = {
-      { "<leader>gg", "<cmd>Neogit<CR>", desc = "Neo GIT" },
+      { "<leader>gg", "<cmd>LazyGit<CR>", desc = "Lazy Git" },
     },
   },
 }

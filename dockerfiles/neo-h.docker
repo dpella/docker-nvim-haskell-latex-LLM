@@ -187,4 +187,14 @@ RUN echo '/usr/bin/ssh-add /root/.ssh/key' >> ${WORKINGDIR}/.bashrc
 RUN echo 'git config --global user.name "Alejandro Russo"' >> ${WORKINGDIR}/.bashrc
 RUN echo 'git config --global user.email alejandro@dpella.io' >> ${WORKINGDIR}/.bashrc
 
+## Lazygit (visual aid for git)
+RUN curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*' > version
+RUN echo -n 'curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_' > cmd
+RUN echo -n $(cat version) >> cmd
+RUN echo -n '_Linux_x86_64.tar.gz"' >> cmd
+RUN cat cmd | /bin/sh
+RUN tar xf lazygit.tar.gz lazygit
+RUN install lazygit /usr/local/bin
+RUN rm -f cmd lazygit lazygit.tar.gz version
+
 ENTRYPOINT [ "/bin/entrypoint" ]
