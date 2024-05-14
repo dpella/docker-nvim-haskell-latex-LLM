@@ -58,6 +58,11 @@ vim.api.nvim_create_autocmd("VimEnter", {
       vim.cmd "MasonInstall prettier@2.8.8"
     end
 
+    -- Grammar checker
+    if not mr.is_installed "ltex-ls" then
+      vim.cmd "MasonInstall ltex-ls"
+    end
+
     -- vim.cmd "TSInstall haskell"
   end,
 })

@@ -49,6 +49,7 @@ return {
           "hls", -- Haskell
           "marksman", -- Markdown
           "texlab", -- Latex
+          "ltex", -- Grammar checking
         },
         automatic_instalation = true,
       }
