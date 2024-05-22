@@ -83,7 +83,11 @@ RUN apt-get update \
 	npm \
 	ripgrep \
 	dbus-x11 \
-	openjdk-11-jdk
+	openjdk-11-jdk \
+	fd-find \
+	luarocks
+
+RUN luarocks install jsregexp
 
 ##
 # Latex 
