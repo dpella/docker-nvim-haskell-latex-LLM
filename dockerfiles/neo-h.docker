@@ -51,7 +51,8 @@ RUN apt-get update \
          dirmngr \
 	 build-essential \
        	 lsb-release \
-         gnupg2  
+         gnupg2 \ 
+	 socat  
 
 RUN apt-get install -y powerline \ 
     && \  
@@ -172,6 +173,14 @@ COPY ./otherfiles/mappings.lua   ${WORKINGDIR}/.config/nvim/lua/
 COPY ./otherfiles/chadrc.lua     ${WORKINGDIR}/.config/nvim/lua/
 COPY ./otherfiles/conform.lua    ${WORKINGDIR}/.config/nvim/lua/configs/
 COPY ./otherfiles/lspconfig.lua  ${WORKINGDIR}/.config/nvim/lua/configs/
+
+##
+# Clipboard from docker into WSL 
+##
+COPY ./otherfiles/clip.sh  /usr/local/bin 
+RUN chmod +x /usr/local/bin/clip.sh
+RUN ln -s /usr/local/bin/clip.sh /usr/local/bin/xclip 
+RUN ln -s /usr/local/bin/clip.sh /usr/local/bin/xsel
 
 ## 
 # Haskell
