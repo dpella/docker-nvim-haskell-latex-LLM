@@ -174,11 +174,12 @@ COPY ./otherfiles/chadrc.lua     ${WORKINGDIR}/.config/nvim/lua/
 COPY ./otherfiles/conform.lua    ${WORKINGDIR}/.config/nvim/lua/configs/
 COPY ./otherfiles/lspconfig.lua  ${WORKINGDIR}/.config/nvim/lua/configs/
 
-# Installing plugins and highlighting (Tree sitter)
-#
+# Installing plugins NEOVIM  
 RUN /opt/nvim-linux64/bin/nvim -c "silent! PlugInstall" +qall
-# RUN /opt/nvim-linux64/bin/nvim -c "silent! TSUpdate" +qall
-# RUN /opt/nvim-linux64/bin/nvim -c "silent! MasonInstall" +qall
+# Installing language servers and formatters NEOVIM 
+RUN /opt/nvim-linux64/bin/nvim --headless +"MasonUpdate" +q
+RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall marksman stylua lua-language-server prettier@2.8.8" +q
+RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall ltex-ls texlab" +q 
 
 ##
 # Clipboard from docker into WSL 
@@ -207,6 +208,9 @@ ENV PATH=$PATH:${WORKINGDIR}/.cabal/bin
 
 # Fast-tag for Haskell files 
 RUN cabal install fast-tags 
+
+# Installing Haskell language server
+RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall fourmolu haskell-language-server" +q 
 
 # File format options for Haskell code 
 COPY ./otherfiles/fourmolu.yaml  ${WORKINGDIR}
