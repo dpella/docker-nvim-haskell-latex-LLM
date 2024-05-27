@@ -214,6 +214,7 @@ RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall fourmolu haskell-langua
 
 # File format options for Haskell code 
 COPY ./otherfiles/fourmolu.yaml  ${WORKINGDIR}
+RUN mv ${WORKINGDIR}/fourmolu.yaml ${WORKINGDIR}/.local/share/nvim/mason/bin/
 
 ## Config GIT 
 RUN echo '/usr/bin/ssh-add /root/.ssh/key' >> ${WORKINGDIR}/.bashrc
