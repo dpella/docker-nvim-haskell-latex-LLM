@@ -231,5 +231,9 @@ RUN tar xf lazygit.tar.gz lazygit
 RUN install lazygit /usr/local/bin
 RUN rm -f cmd lazygit lazygit.tar.gz version
 
+## Installing highlighting NEOVIM
+# Note: sleep needed for tree-sitter to load 
+# It is enough to install one language to trigger the install of all the others relevant for this configuration
+# RUN /opt/nvim-linux64/bin/nvim --headless +"sleep 3" +"TSInstall haskell" +q
 
 ENTRYPOINT [ "/bin/entrypoint" ]
