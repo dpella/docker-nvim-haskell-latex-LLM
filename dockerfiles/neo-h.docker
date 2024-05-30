@@ -218,8 +218,9 @@ RUN mv ${WORKINGDIR}/fourmolu.yaml ${WORKINGDIR}/.local/share/nvim/mason/bin/
 
 ## Config GIT 
 RUN echo '/usr/bin/ssh-add /root/.ssh/key' >> ${WORKINGDIR}/.bashrc
-RUN echo 'git config --global user.name "Alejandro Russo"' >> ${WORKINGDIR}/.bashrc
-RUN echo 'git config --global user.email alejandro@dpella.io' >> ${WORKINGDIR}/.bashrc
+COPY ./ssh/gituser ${WORKINGDIR} 
+RUN cat ${WORKINGDIR}/gituser >> ${WORKINGDIR}/.bashrc 
+RUN rm -f ${WORKINGDIR}/gituser 
 
 ## Lazygit (visual aid for git)
 RUN curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*' > version
