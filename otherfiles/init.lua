@@ -18,6 +18,7 @@ return {
         "haskell",
         "markdown",
         "latex",
+	"bibtex",
 
         -- web dev
         "html",
