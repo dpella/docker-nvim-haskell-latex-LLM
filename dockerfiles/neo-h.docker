@@ -111,7 +111,8 @@ RUN apt-get update \
 	texlive-extra-utils \
 	texlive-bibtex-extra \
 	python3-pygments \
-	biber
+	biber \
+	texlive-fonts-extra
 
 
 ##
