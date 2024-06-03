@@ -185,7 +185,7 @@ return {
     "David-Kunz/gen.nvim",
     lazy = false,
     opts = {
-      model = "mistral",
+      model = "mistral:instruct",
       -- show_model = true,
     },
     -- keys = {
