@@ -233,6 +233,13 @@ RUN tar xf lazygit.tar.gz lazygit
 RUN install lazygit /usr/local/bin
 RUN rm -f cmd lazygit lazygit.tar.gz version
 
+## AI LLM 
+
+RUN curl -fsSL https://ollama.com/install.sh | sh
+COPY ./otherfiles/ollama.sh ${WORKINGDIR}
+RUN ${WORKINGDIR}/ollama.sh
+RUN rm -f ${WORKINGDIR}/ollama.sh
+
 ## Installing highlighting NEOVIM
 # Note: sleep needed for tree-sitter to load 
 # It is enough to install one language to trigger the install of all the others relevant for this configuration

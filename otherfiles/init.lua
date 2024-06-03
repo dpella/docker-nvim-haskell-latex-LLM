@@ -18,7 +18,7 @@ return {
         "haskell",
         "markdown",
         "latex",
-	"bibtex",
+        "bibtex",
 
         -- web dev
         "html",
@@ -178,5 +178,18 @@ return {
     config = function()
       require("telescope").load_extension "bibtex"
     end,
+  },
+
+  -- AI - LLM
+  {
+    "David-Kunz/gen.nvim",
+    lazy = false,
+    opts = {
+      model = "mistral",
+      -- show_model = true,
+    },
+    -- keys = {
+    --   { "<leader>ww", "<cmd>Gen<CR>", desc = "LLM Prompt" },
+    -- },
   },
 }

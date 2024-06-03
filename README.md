@@ -13,7 +13,8 @@ You have all of NvChad with the addition of severals plugins and configurations 
 7. Multi-cursor editing capabilities (`<C-m>`)
 8. Keeping tracks of comments of the form `TODO:`, `HACK:`, and `BUG:` (`]t` and `[t` for next an prev comment)
 9. Save and restore sessions (`<leader> z`)
-10. Welcome screen of DPella (the company where I work)
+10. LLM Support (Ollama) with Mistral model (`<leader> ww`)
+11. Welcome screen of DPella (the company where I work)
 
 All of the docker images will have a volume associated with it and mounted in `/vol`.
 This is the directory where you should put all your persisten data.
