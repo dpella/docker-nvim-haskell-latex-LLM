@@ -65,6 +65,7 @@ echo "Launching the container..."
 
 docker run --rm \
 	   -d   \
+	   --cpus="8" \
            -it  \
 	   -v $(pwd)/ssh:/tmp/ssh:ro \
 	   -v ${IMAGE}:/vol  \
