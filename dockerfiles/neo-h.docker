@@ -240,6 +240,10 @@ COPY ./otherfiles/ollama.sh ${WORKINGDIR}
 RUN ${WORKINGDIR}/ollama.sh
 RUN rm -f ${WORKINGDIR}/ollama.sh
 
+# Patch will NVim Plugin - It should be removed once the plugin gets fixed
+RUN sed -i '338s/end_pos\[3\], lines)/end_pos\[3\]-1, lines)/' \
+    ${WORKINGDIR}/.local/share/nvim/lazy/gen.nvim/lua/gen/init.lua
+
 ## Installing highlighting NEOVIM
 # Note: sleep needed for tree-sitter to load 
 # It is enough to install one language to trigger the install of all the others relevant for this configuration
