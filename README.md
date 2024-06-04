@@ -40,11 +40,11 @@ Don't forget to upload the public keys to Github or Bitbucket.
  
 ## Git 
 
-In file `./dockerfiles/neo-h.docker`, change the following lines with your name and email address. 
+In file `./ssh/gituser`, complete the following lines with your name and email address. 
 
 ```bash
-RUN echo 'git config --global user.name "Alejandro Russo"' >> ${WORKINGDIR}/.bashrc
-RUN echo 'git config --global user.email alejandro@dpella.io' >> ${WORKINGDIR}/.bashrc
+git config --global user.name "Your name here" 
+git config --global user.email you@email.address
 ```
 
 # Launch 
@@ -67,5 +67,9 @@ Once inside the container, type
 ```bash 
 nvim 
 ```
-
 Enjoy! 
+
+# Customization 
+
+- Welcome banner: `./otherfiles/chadrc.lua` 
+- Key mappings: `./otherfiles/mappings.lua`
