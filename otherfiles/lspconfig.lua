@@ -56,7 +56,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
-local servers = { "hls", "lua_ls", "marksman", "texlab", "ltex" }
+local servers = { "hls", "lua_ls", "marksman", "texlab" }
 -- lsps with default config
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
@@ -65,6 +65,15 @@ for _, lsp in ipairs(servers) do
     capabilities = capabilities,
   }
 end
+
+lspconfig["ltex"].setup {
+  on_attach = function(client, bufnr)
+    require("ltex_extra").setup()
+    on_attach(client, bufnr)
+  end,
+  on_init = on_init,
+  capabilities = capabilities,
+}
 
 -- typescript
 lspconfig.tsserver.setup {

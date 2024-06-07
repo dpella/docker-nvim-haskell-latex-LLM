@@ -192,4 +192,8 @@ return {
     --   { "<leader>ww", "<cmd>Gen<CR>", desc = "LLM Prompt" },
     -- },
   },
+  -- LTex Extras (like adding word to a dictionary)
+  {
+    "barreiroleo/ltex-extra.nvim",
+  },
 }
