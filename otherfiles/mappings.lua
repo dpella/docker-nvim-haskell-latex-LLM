@@ -27,3 +27,7 @@ map({ "n", "v" }, "<leader>mp", function()
     timeout_ms = 1000,
   }
 end)
+
+-- Quickfix list
+map({ "n" }, "ff", "<cmd> cprev <CR>", { desc = "Prev quickfix" })
+map({ "n" }, "vv", "<cmd> cnext <CR>", { desc = "Next quickfix" })
