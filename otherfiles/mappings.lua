@@ -31,3 +31,11 @@ end)
 -- Quickfix list
 map({ "n" }, "ff", "<cmd> cprev <CR>", { desc = "Prev quickfix" })
 map({ "n" }, "vv", "<cmd> cnext <CR>", { desc = "Next quickfix" })
+
+-- Moving tabs
+map("n", "<A-1>", "<cmd> tabnext 1 <CR>", { desc = "Tab 1" })
+map("n", "<A-2>", "<cmd> tabnext 2 <CR>", { desc = "Tab 2" })
+map("n", "<A-3>", "<cmd> tabnext 3 <CR>", { desc = "Tab 3" })
+map("n", "<A-4>", "<cmd> tabnext 4 <CR>", { desc = "Tab 4" })
+map("n", "<A-5>", "<cmd> tabnext 5 <CR>", { desc = "Tab 5" })
+map("n", "<A-6>", "<cmd> tabnext 6 <CR>", { desc = "Tab 6" })
