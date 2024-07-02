@@ -244,6 +244,7 @@ RUN rm -f ${WORKINGDIR}/ollama.sh
 RUN sed -i '338s/end_pos\[3\], lines)/end_pos\[3\]-1, lines)/' \
     ${WORKINGDIR}/.local/share/nvim/lazy/gen.nvim/lua/gen/init.lua
 
+RUN echo 'export OLLAMA_HOST="127.0.0.1:2022"' >> ${WORKINGDIR}/.bashrc
 ## Installing highlighting NEOVIM
 # Note: sleep needed for tree-sitter to load 
 # It is enough to install one language to trigger the install of all the others relevant for this configuration
