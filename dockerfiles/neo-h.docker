@@ -236,9 +236,14 @@ RUN rm -f cmd lazygit lazygit.tar.gz version
 ## AI LLM 
 
 RUN curl -fsSL https://ollama.com/install.sh | sh
-COPY ./otherfiles/ollama.sh ${WORKINGDIR}
-RUN ${WORKINGDIR}/ollama.sh
-RUN rm -f ${WORKINGDIR}/ollama.sh
+
+COPY ./ssh/llm ${WORKINGDIR}
+
+RUN bash -c 'source /root/llm ; if [[ $LLM_MODE -eq 0 ]]; then ollama serve & sleep 10 && ollama pull mistral:instruct; else echo ssh -o \"StrictHostKeyChecking no\" -N -L ${LLM_PORT}:${LLM_SERVER}:${LLM_PORT} ${SSH_USER}@${LLM_SERVER} -p ${SSH_PORT} \& >> /root/.bashrc ; fi' 
+
+RUN bash -c 'source /root/llm ; echo "export OLLAMA_HOST=\"127.0.0.1:${LLM_PORT}\" " >> /root/.bashrc'
+
+RUN rm -f ./llm
 
 # Patch will NVim Plugin - It should be removed once the plugin gets fixed
 RUN sed -i '338s/end_pos\[3\], lines)/end_pos\[3\]-1, lines)/' \

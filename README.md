@@ -46,6 +46,34 @@ In file `./ssh/gituser`, complete the following lines with your name and email a
 git config --global user.name "Your name here" 
 git config --global user.email you@email.address
 ```
+## LLM (Mistral)
+
+You can run LLM inside nvim! The image will be preconfigured with [Mistral AI model](https://mistral.ai/) 
+run via [Ollama](https://ollama.com/). You can run the LLM locally or connect to a remote server via SSH. 
+
+Go to the file `./ssh/llm` 
+
+```bash
+LLM_MODE=0  # 0 for local, and 1 for connecting with a remote server via SSH tunneling
+
+# For remote only  
+LLM_SERVER=<your Ollama server>
+LLM_PORT=<port where Ollama is listening, default 2022>
+SSH_USER=<your username to login into the remote machine>
+SSH_PORT=<the port where SSH is listening>
+```
+If you want to change the LLM model or use another port (that is not 2022), you
+should also need to change the file `otherfiles/init.lua`: 
+
+```lua 
+{
+    "David-Kunz/gen.nvim",
+    lazy = false,
+    opts = {
+      model = "mistral:instruct",
+      port = 2022,
+    },
+```
 
 # Launch 
 

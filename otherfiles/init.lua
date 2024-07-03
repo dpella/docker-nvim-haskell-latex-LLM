@@ -186,6 +186,7 @@ return {
     lazy = false,
     opts = {
       model = "mistral:instruct",
+      port = "2022",
       -- show_model = true,
     },
     -- keys = {
