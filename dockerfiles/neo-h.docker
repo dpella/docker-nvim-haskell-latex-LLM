@@ -237,7 +237,11 @@ RUN rm -f cmd lazygit lazygit.tar.gz version
 
 RUN curl -fsSL https://ollama.com/install.sh | sh
 
-RUN bash -c 'ollama serve & sleep 10 && ollama pull mistral:instruct' 
+COPY ./ssh/llm ${WORKINGDIR}
+
+RUN bash -c 'source /root/llm ; if [[ $LLM_MODE -eq 0 ]]; then ollama serve & sleep 10 && ollama pull mistral:instruct; else echo not implemented; fi' 
+
+RUN rm -f ./llm
 
 # Patch will NVim Plugin - It should be removed once the plugin gets fixed
 RUN sed -i '338s/end_pos\[3\], lines)/end_pos\[3\]-1, lines)/' \
