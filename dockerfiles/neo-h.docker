@@ -239,7 +239,7 @@ RUN curl -fsSL https://ollama.com/install.sh | sh
 
 COPY ./ssh/llm ${WORKINGDIR}
 
-RUN bash -c 'source /root/llm ; if [[ $LLM_MODE -eq 0 ]]; then ollama serve & sleep 10 && ollama pull mistral:instruct; else echo not implemented; fi' 
+RUN bash -c 'source /root/llm ; if [[ $LLM_MODE -eq 0 ]]; then ollama serve & sleep 10 && ollama pull mistral:instruct; else echo ssh -o \"StrictHostKeyChecking no\" -N -L 2022:${LLM_SERVER}:${LLM_PORT} ${SSH_USER}@${LLM_SERVER} -p ${SSH_PORT} \& >> /root/.bashrc ; fi' 
 
 RUN rm -f ./llm
 

@@ -5,4 +5,5 @@ LLM_MODE=0
 # For remote connection using ollama
 LLM_SERVER=<your server> 
 LLM_PORT=2022
-LLM_USER=<your user>
+SSH_USER=<your username> 
+SSH_PORT=<port> 
