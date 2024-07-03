@@ -239,7 +239,9 @@ RUN curl -fsSL https://ollama.com/install.sh | sh
 
 COPY ./ssh/llm ${WORKINGDIR}
 
-RUN bash -c 'source /root/llm ; if [[ $LLM_MODE -eq 0 ]]; then ollama serve & sleep 10 && ollama pull mistral:instruct; else echo ssh -o \"StrictHostKeyChecking no\" -N -L 2022:${LLM_SERVER}:${LLM_PORT} ${SSH_USER}@${LLM_SERVER} -p ${SSH_PORT} \& >> /root/.bashrc ; fi' 
+RUN bash -c 'source /root/llm ; if [[ $LLM_MODE -eq 0 ]]; then ollama serve & sleep 10 && ollama pull mistral:instruct; else echo ssh -o \"StrictHostKeyChecking no\" -N -L ${LLM_PORT}:${LLM_SERVER}:${LLM_PORT} ${SSH_USER}@${LLM_SERVER} -p ${SSH_PORT} \& >> /root/.bashrc ; fi' 
+
+RUN bash -c 'source /root/llm ; echo "export OLLAMA_HOST=\"127.0.0.1:${LLM_PORT}\" " >> /root/.bashrc'
 
 RUN rm -f ./llm
 
@@ -247,7 +249,6 @@ RUN rm -f ./llm
 RUN sed -i '338s/end_pos\[3\], lines)/end_pos\[3\]-1, lines)/' \
     ${WORKINGDIR}/.local/share/nvim/lazy/gen.nvim/lua/gen/init.lua
 
-RUN echo 'export OLLAMA_HOST="127.0.0.1:2022"' >> ${WORKINGDIR}/.bashrc
 ## Installing highlighting NEOVIM
 # Note: sleep needed for tree-sitter to load 
 # It is enough to install one language to trigger the install of all the others relevant for this configuration
