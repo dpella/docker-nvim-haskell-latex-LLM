@@ -145,6 +145,52 @@ RUN cat ${WORKINGDIR}/fzf >> ${WORKINGDIR}/.bashrc && rm ${WORKINGDIR}/fzf
 WORKDIR ${WORKINGDIR}
 
 ## 
+# Haskell
+## 
+RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
+
+# Add ghcup to the PATH
+ENV PATH="${WORKINGDIR}/.ghcup/bin:$PATH"
+
+RUN ghcup install ghc 9.6.4
+RUN ghcup set ghc 9.6.4
+
+# Install cabal
+RUN ghcup install cabal 3.10.1.0
+RUN ghcup set cabal 3.10.1.0
+
+# Install HLS
+RUN ghcup install hls 2.7.0.0
+RUN ghcup set hls 2.7.0.0 
+
+ENV PATH=$PATH:${WORKINGDIR}/.cabal/bin
+
+# Fast-tag for Haskell files 
+RUN cabal install fast-tags 
+
+# Hoogle 
+RUN cabal install hoogle 
+
+## Config GIT 
+RUN echo '/usr/bin/ssh-add /root/.ssh/key' >> ${WORKINGDIR}/.bashrc
+COPY ./ssh/gituser ${WORKINGDIR} 
+RUN cat ${WORKINGDIR}/gituser >> ${WORKINGDIR}/.bashrc 
+RUN rm -f ${WORKINGDIR}/gituser 
+
+## Lazygit (visual aid for git)
+RUN curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*' > version
+RUN echo -n 'curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_' > cmd
+RUN echo -n $(cat version) >> cmd
+RUN echo -n '_Linux_x86_64.tar.gz"' >> cmd
+RUN cat cmd | /bin/sh
+RUN tar xf lazygit.tar.gz lazygit
+RUN install lazygit /usr/local/bin
+RUN rm -f cmd lazygit lazygit.tar.gz version
+
+## AI LLM 
+RUN curl -fsSL https://ollama.com/install.sh | sh
+
+## 
 # NEO Vim 
 ##
 
@@ -190,33 +236,6 @@ RUN chmod +x /usr/local/bin/clip.sh
 RUN ln -s /usr/local/bin/clip.sh /usr/local/bin/xclip 
 RUN ln -s /usr/local/bin/clip.sh /usr/local/bin/xsel
 
-## 
-# Haskell
-## 
-RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
-
-# Add ghcup to the PATH
-ENV PATH="${WORKINGDIR}/.ghcup/bin:$PATH"
-
-RUN ghcup install ghc 9.6.4
-RUN ghcup set ghc 9.6.4
-
-# Install cabal
-RUN ghcup install cabal 3.10.1.0
-RUN ghcup set cabal 3.10.1.0
-
-# Install HLS
-RUN ghcup install hls 2.7.0.0
-RUN ghcup set hls 2.7.0.0 
-
-ENV PATH=$PATH:${WORKINGDIR}/.cabal/bin
-
-# Fast-tag for Haskell files 
-RUN cabal install fast-tags 
-
-# Hoogle 
-RUN cabal install hoogle 
-
 # Installing Haskell language server
 RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall fourmolu" +q 
 
@@ -224,26 +243,7 @@ RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall fourmolu" +q
 COPY ./otherfiles/fourmolu.yaml  ${WORKINGDIR}
 RUN mv ${WORKINGDIR}/fourmolu.yaml ${WORKINGDIR}/.local/share/nvim/mason/bin/
 
-## Config GIT 
-RUN echo '/usr/bin/ssh-add /root/.ssh/key' >> ${WORKINGDIR}/.bashrc
-COPY ./ssh/gituser ${WORKINGDIR} 
-RUN cat ${WORKINGDIR}/gituser >> ${WORKINGDIR}/.bashrc 
-RUN rm -f ${WORKINGDIR}/gituser 
-
-## Lazygit (visual aid for git)
-RUN curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*' > version
-RUN echo -n 'curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_' > cmd
-RUN echo -n $(cat version) >> cmd
-RUN echo -n '_Linux_x86_64.tar.gz"' >> cmd
-RUN cat cmd | /bin/sh
-RUN tar xf lazygit.tar.gz lazygit
-RUN install lazygit /usr/local/bin
-RUN rm -f cmd lazygit lazygit.tar.gz version
-
-## AI LLM 
-
-RUN curl -fsSL https://ollama.com/install.sh | sh
-
+## Setting up OLLAMA
 COPY ./ssh/llm ${WORKINGDIR}
 
 RUN bash -c 'source /root/llm ; if [[ $LLM_MODE -eq 0 ]]; then ollama serve & sleep 10 && ollama pull mistral:instruct; else echo ssh -o \"StrictHostKeyChecking no\" -N -L ${LLM_PORT}:${LLM_SERVER}:${LLM_PORT} ${SSH_USER}@${LLM_SERVER} -p ${SSH_PORT} \& >> /root/.bashrc ; fi' 

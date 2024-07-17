@@ -5,6 +5,20 @@ This repository builds a docker image of NvChad -- a customization of Neo Vim.
 You have all of NvChad with the addition of severals plugins and configurations to:
 
 1. Develop in Haskell (language server) 
+	a. `<leader>ld` shows all the errors/suggestions 
+	b. `<leader>lt` shows all tags 
+	c. `<leader>ls` shows all symbols
+	d. `<leader>lb` shows all buffers
+	e. `<leader>ca` shows recommendations for the code 
+	f. `<leader>dd` shows the error/suggestion 
+	g. `<leader>rr` evaluate the expression under `-- >>>`
+	h. `<leader>rr` evaluate the expression under `-- >>>`
+	i. `<leader>ra` evaluate all the expressions under `-- >>>`
+	j. `<leader>rp` GHCi for the package 
+	k. `<leader>rf` GHCi for the current file
+	l. `<leader>rq` close GHCi 
+	m. `]d` next suggestion/error
+	n. `[d` previous suggestion/error
 2. Write markdown documents (language server) 
 3. Write, compile, and visualize Latex documents (`<leader> cl`)
 4. Manage repositories and commits (Lazygit, `<leager gg>`)
