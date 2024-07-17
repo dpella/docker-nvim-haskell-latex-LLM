@@ -38,31 +38,4 @@ vim.schedule(function()
   require "mappings"
 end)
 
-local mr = require "mason-registry"
 
--- Auto-install Mason Pretty Printers
-vim.api.nvim_create_autocmd("VimEnter", {
-  callback = function()
-    -- Lua
-    if not mr.is_installed "stylua" then
-      vim.cmd "MasonInstall stylua"
-    end
-
-    -- Haskell
-    if not mr.is_installed "fourmolu" then
-      vim.cmd "MasonInstall fourmolu"
-    end
-
-    -- Markdown
-    if not mr.is_installed "prettier" then
-      vim.cmd "MasonInstall prettier@2.8.8"
-    end
-
-    -- Grammar checker
-    if not mr.is_installed "ltex-ls" then
-      vim.cmd "MasonInstall ltex-ls"
-    end
-
-    -- vim.cmd "TSInstall haskell"
-  end,
-})
