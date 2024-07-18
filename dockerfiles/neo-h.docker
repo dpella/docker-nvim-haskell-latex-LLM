@@ -169,7 +169,14 @@ ENV PATH=$PATH:${WORKINGDIR}/.cabal/bin
 RUN cabal install fast-tags 
 
 # Hoogle 
-RUN cabal install hoogle 
+# The way to do it should be like this: RUN cabal install hoogle 
+# Hoogle has currently a bug so we need to install it from the repo
+
+RUN git clone https://github.com/ndmitchell/hoogle.git 
+RUN sed -i 's/crypton-connection/crypton-connection == 0.3.2/g' ${WORKINGDIR}/hoogle/hoogle.cabal 
+RUN cd hoogle && cabal install 
+RUN hoogle generate 
+RUN rm -fr hoogle 
 
 ## Config GIT 
 RUN echo '/usr/bin/ssh-add /root/.ssh/key' >> ${WORKINGDIR}/.bashrc
@@ -231,10 +238,7 @@ RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall ltex-ls texlab" +q
 ##
 # Clipboard from docker into WSL 
 ##
-COPY ./otherfiles/clip.sh  /usr/local/bin 
-RUN chmod +x /usr/local/bin/clip.sh
-RUN ln -s /usr/local/bin/clip.sh /usr/local/bin/xclip 
-RUN ln -s /usr/local/bin/clip.sh /usr/local/bin/xsel
+RUN apt-get update && apt-get install -y xclip 
 
 # Installing Haskell language server
 RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall fourmolu" +q 

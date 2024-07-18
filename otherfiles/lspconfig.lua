@@ -73,8 +73,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
     opts1.desc = "Run code in -- >>>"
     vim.keymap.set("n", "<leader>rr", vim.lsp.codelens.run, opts1)
     -- -- Hoogle search for the type signature of the definition under the cursor
-    -- opts1.desc = "Hoogle search"
-    -- vim.keymap.set("n", "<leader>ts", ht.hoogle.hoogle_signature, opts1)
+    opts1.desc = "Hoogle search"
+    vim.keymap.set("n", "<leader>ts", ht.hoogle.hoogle_signature, opts1)
     -- Evaluate all code snippets
     opts1.desc = "Run all the code snippets in -- >>>"
     vim.keymap.set("n", "<space>ra", ht.lsp.buf_eval_all, opts1)
