@@ -238,10 +238,7 @@ RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall ltex-ls texlab" +q
 ##
 # Clipboard from docker into WSL 
 ##
-# COPY ./otherfiles/clip.sh  /usr/local/bin 
-# RUN chmod +x /usr/local/bin/clip.sh
-# RUN ln -s /usr/local/bin/clip.sh /usr/local/bin/xclip 
-# RUN ln -s /usr/local/bin/clip.sh /usr/local/bin/xsel
+RUN apt-get update && apt-get install -y xclip 
 
 # Installing Haskell language server
 RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall fourmolu" +q 
