@@ -203,4 +203,12 @@ return {
     version = "^3", -- Recommended
     lazy = false, -- This plugin is already lazy
   },
+  -- Renaming
+  {
+    "smjonas/inc-rename.nvim",
+    config = function()
+      require("inc_rename").setup()
+    end,
+    lazy = false,
+  },
 }
