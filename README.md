@@ -18,18 +18,19 @@ You have all of NvChad with the addition of severals plugins and configurations 
 	- `<leader>rf` GHCi for the current file
 	- `<leader>rq` close GHCi 
 	- `]d` next suggestion/error
-	- `[d` previous suggestion/error
-        - `<leader>ts` provides type-signatures that fit a type-hole using Hoogle
+	- `[d` previous suggestion/error 
+	- `<leader>ts` provides type-signatures that fit a type-hole using Hoogle
 2. Write markdown documents (language server) 
 3. Write, compile, and visualize Latex documents (`<leader> cl`)
 4. Manage repositories and commits (Lazygit, `<leager gg>`)
 5. Auto-indentation when saving files (`*.hs`, `*.tex`, `*.lua`)
 6. Dictionary and writting suggestion by ltex 
-7. Multi-cursor editing capabilities (`<C-m>`)
-8. Keeping tracks of comments of the form `TODO:`, `HACK:`, and `BUG:` (`]t` and `[t` for next an prev comment)
-9. Save and restore sessions (`<leader> z`)
-10. LLM Support (Ollama) with Mistral model (`<leader> ww`)
-11. Welcome screen of DPella (the company where I work)
+7. Multi-cursor editing capabilities (`<C-m>`, then `n` to move to next one, `q` to skip that occurence)
+8. Smart rename (position in a word and hit `<leader>sr`)
+9. Keeping tracks of comments of the form `TODO:`, `HACK:`, and `BUG:` (`]t` and `[t` for next an prev comment)
+10. Save and restore sessions (`<leader> z`)
+11. LLM Support (Ollama) with Mistral model (`<leader> ww`)
+12. Welcome screen of DPella (the company where I work)
 
 All of the docker images will have a volume associated with it and mounted in `/vol`.
 This is the directory where you should put all your persisten data.
@@ -106,6 +107,13 @@ docker attach <4 first letters of the container created>
 ```
 
 Once inside the container, type 
+
+```bash 
+./llm.sh
+```
+to start the LLM locally or to connect to the remote server. 
+
+then, 
 
 ```bash 
 nvim 
