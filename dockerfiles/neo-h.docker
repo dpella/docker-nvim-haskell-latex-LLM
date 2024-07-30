@@ -11,9 +11,6 @@ ENV TZ=Europe/Stockholm
 ENV WORKINGDIR=/root
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Copy the entrypoint script and make it the container's entrypoint
-COPY ./otherfiles/entrypoint.sh /bin/entrypoint
-
 ##
 # Auxiliaries files for configuration of utilities  
 ##
@@ -54,18 +51,18 @@ RUN apt-get update \
          gnupg2 \ 
 	 socat  
 
-RUN apt-get install -y powerline \ 
-    && \  
-    apt-get install -y less \
+RUN apt-get update \
+    && \
+    apt-get install -y \
+        powerline \ 
+        less \
     && \ 
     mkdir ~/.ssh \ 
     && \
     touch ~/.ssh/known_hosts \
     && \ 
-    ssh-keyscan github.com >> ~/.ssh/known_hosts \ 
-    && \ 
-    chmod +x /bin/entrypoint
-
+    ssh-keyscan github.com >> ~/.ssh/known_hosts 
+ 
 ##
 # Utilities required by neo-vim plugins
 ## 
@@ -85,8 +82,9 @@ RUN apt-get update \
 	ripgrep \
 	dbus-x11 \
 	openjdk-11-jdk \
-	fd-find \
-	luarocks
+	fd-find \ 
+	luarocks 
+
 
 RUN luarocks install jsregexp
 
@@ -173,7 +171,7 @@ RUN cabal install fast-tags
 # Hoogle has currently a bug so we need to install it from the repo
 
 RUN git clone https://github.com/ndmitchell/hoogle.git 
-RUN sed -i 's/crypton-connection/crypton-connection == 0.3.2/g' ${WORKINGDIR}/hoogle/hoogle.cabal 
+# RUN sed -i 's/crypton-connection/crypton-connection == 0.3.2/g' ${WORKINGDIR}/hoogle/hoogle.cabal 
 RUN cd hoogle && cabal install 
 RUN hoogle generate 
 RUN rm -fr hoogle 
@@ -265,5 +263,23 @@ RUN sed -i '338s/end_pos\[3\], lines)/end_pos\[3\]-1, lines)/' \
 # Note: sleep needed for tree-sitter to load 
 # It is enough to install one language to trigger the install of all the others relevant for this configuration
 # RUN /opt/nvim-linux64/bin/nvim --headless +"sleep 3" +"TSInstall haskell" +q
+
+# Tmux 
+RUN apt-get update && apt-get install -y tmux 
+RUN git clone https://github.com/tmux-plugins/tpm ${WORKINGDIR}/.tmux/plugins/tpm
+COPY ./otherfiles/.tmux.conf ${WORKINGDIR}
+
+# Copy the entrypoint script and make it the container's entrypoint
+COPY ./otherfiles/entrypoint.sh /bin/entrypoint
+RUN chmod +x /bin/entrypoint
+
+RUN tmux start-server && \
+    tmux new-session -d && \
+    sleep 1 && \
+    ~/.tmux/plugins/tpm/scripts/install_plugins.sh && \
+    tmux kill-server
+
+# Needed for tmux plugins 
+RUN apt-get update && apt-get install -y inetutils-ping
 
 ENTRYPOINT [ "/bin/entrypoint" ]
