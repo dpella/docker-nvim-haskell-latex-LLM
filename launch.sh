@@ -71,6 +71,7 @@ docker run --rm \
 	   -v ${IMAGE}:/vol  \
            -v /tmp/.X11-unix:/tmp/.X11-unix \
            -v /mnt/wslg:/mnt/wslg \
+	   -e "TERM=xterm-256color" \
            -e DISPLAY \
            -e WAYLAND_DISPLAY \
            -e XDG_RUNTIME_DIR \
