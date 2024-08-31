@@ -282,4 +282,7 @@ RUN tmux start-server && \
 # Needed for tmux plugins 
 RUN apt-get update && apt-get install -y inetutils-ping
 
+# Miscelaneous 
+RUN apt-get update && apt-get install -y pdftk evince 
+
 ENTRYPOINT [ "/bin/entrypoint" ]
