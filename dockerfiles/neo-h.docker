@@ -284,7 +284,7 @@ RUN tmux start-server && \
 # Needed for tmux plugins 
 RUN apt-get update && apt-get install -y inetutils-ping
 
-# Miscelaneous 
-RUN apt-get update && apt-get install -y pdftk evince 
+# Miscelaneous (PDF tools and graphic tools)
+RUN apt-get update && apt-get install -y pdftk evince inkscape lhs2tex
 
 ENTRYPOINT [ "/bin/entrypoint" ]
