@@ -284,4 +284,10 @@ RUN tmux start-server && \
 # Needed for tmux plugins 
 RUN apt-get update && apt-get install -y inetutils-ping
 
+# Tools to write courses with MkDocs 
+
+RUN apt-get update && apt-get install -y pip 
+RUN pip install pymdown-extensions
+RUN pip install mkdocs
+
 ENTRYPOINT [ "/bin/entrypoint" ]
