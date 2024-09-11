@@ -290,4 +290,7 @@ RUN apt-get update && apt-get install -y pip
 RUN pip install pymdown-extensions
 RUN pip install mkdocs
 
+# Miscelaneous (PDF tools and graphic tools)
+RUN apt-get update && apt-get install -y pdftk evince inkscape lhs2tex
+
 ENTRYPOINT [ "/bin/entrypoint" ]
