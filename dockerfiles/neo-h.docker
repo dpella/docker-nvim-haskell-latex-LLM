@@ -211,7 +211,7 @@ RUN echo 'export PATH="$PATH:/opt/nvim-linux64/bin"' >> ${WORKINGDIR}/.bashrc
 RUN git clone https://github.com/NvChad/starter ${WORKINGDIR}/.config/nvim
 
 # Tree-sitter (parsers)
-RUN cargo install tree-sitter-cli
+RUN cargo install tree-sitter-cli --version 0.22.6 # Otherwise, it requires the latest version of rust not yet in .deb
 ENV PATH="${WORKINGDIR}/.cargo/bin:$PATH"
 
 # Locale 
