@@ -211,4 +211,13 @@ return {
     end,
     lazy = false,
   },
+
+ {
+    "hedyhli/markdown-toc.nvim",
+    ft = "markdown", -- Lazy load on markdown filetype
+    config = function()
+      require("mtoc").setup {}
+    end,
+  },
+
 }
