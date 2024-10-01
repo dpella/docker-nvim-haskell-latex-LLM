@@ -95,7 +95,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 -- local servers = { "hls", "lua_ls", "marksman", "texlab" }
-local servers = { "lua_ls", "marksman", "texlab" }
+local servers = { "lua_ls", "marksman", "texlab", "pylsp" }
 -- lsps with default config
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {

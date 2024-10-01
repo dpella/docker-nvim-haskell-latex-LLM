@@ -234,6 +234,7 @@ RUN /opt/nvim-linux64/bin/nvim -c "silent! PlugInstall" +qall
 RUN /opt/nvim-linux64/bin/nvim --headless +"MasonUpdate" +q
 RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall marksman stylua lua-language-server prettier@2.8.8" +q
 RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall ltex-ls texlab" +q 
+RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall pylsp" +q 
 
 ##
 # Clipboard from docker into WSL 
@@ -287,8 +288,14 @@ RUN apt-get update && apt-get install -y inetutils-ping
 # Tools to write courses with MkDocs 
 
 RUN apt-get update && apt-get install -y pip 
+RUN pip install --upgrade Pygments
 RUN pip install pymdown-extensions
 RUN pip install mkdocs
+
+# Tools for Python development 
+
+RUN apt-get update && apt-get install python3.10-venv -y
+RUN pip install scipy 
 
 # Miscelaneous (PDF tools and graphic tools)
 RUN apt-get update && apt-get install -y pdftk evince inkscape lhs2tex
