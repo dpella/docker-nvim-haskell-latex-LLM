@@ -48,20 +48,18 @@ else
 	docker volume create ${IMAGE} 
 fi 
 
-echo "Setting up the clipboard to get messages from the container ..." 
+echo "Launching the container..."
 
-if [[ $(command -v socat > /dev/null; echo $?) == 0 ]]; then
-	# Start up the socat forwarder to clip.exe
-        ALREADY_RUNNING=$(ps -auxww | grep -q "[l]isten:8121"; echo $?)
-        if [[ $ALREADY_RUNNING != "0" ]]; then
-            echo "Starting clipboard relay..."
-            (setsid socat tcp-listen:8121,fork,bind=0.0.0.0 EXEC:'clip.exe' &) > /dev/null 2>&1 
-        else
-	    echo "Clipboard relay already running"
-       fi
+
+PORT_OPTION=""
+
+if [ "${IMAGE}" = "neo-h" ]; then
+    PORT_OPTION="-p 0.0.0.0:8000:8000"
 fi
 
-echo "Launching the container..."
+if [ "${IMAGE}" = "llm" ]; then
+    PORT_OPTION="-p 0.0.0.0:8080:8080"
+fi
 
 docker run --rm \
 	   -d   \
@@ -76,7 +74,7 @@ docker run --rm \
            -e WAYLAND_DISPLAY \
            -e XDG_RUNTIME_DIR \
            -e PULSE_SERVER \
-	   -p 0.0.0.0:8000:8000 \
+	   ${PORT_OPTION} \
            ${IMAGE}:devel
 
 
