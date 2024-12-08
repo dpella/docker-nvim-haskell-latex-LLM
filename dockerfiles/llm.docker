@@ -118,10 +118,17 @@ RUN apt-get update && apt-get install -y xclip
 ## Setting up OLLAMA
 COPY ./ssh/llm ${WORKINGDIR}
 
+
+## Screen for connecting to OLLAMA
 RUN bash -c 'echo "#/bin/bash > /root/llm.sh" ; source /root/llm ; if [[ $LLM_MODE -eq 0 ]]; then echo "ollama serve & sleep 10 && ollama pull mistral:instruct" >> /root/llm.sh; else echo ssh -o \"StrictHostKeyChecking no\" -N -L ${LLM_PORT}:${LLM_SERVER}:${LLM_PORT} ${SSH_USER}@${LLM_SERVER} -p ${SSH_PORT} \& >> /root/llm.sh ; fi' 
 
 RUN bash -c 'source /root/llm ; echo "export OLLAMA_HOST=\"127.0.0.1:${LLM_PORT}\" " >> /root/llm.sh'
 RUN bash -c 'chmod oug+x ./llm.sh'
+
+## WebUI Script 
+RUN bash -c 'echo "#/bin/bash > /root/web.sh"'  
+RUN bash -c 'source /root/llm ; if [[ $LLM_MODE -eq 1 ]]; then echo "export OLLAMA_BASE_URL=127.0.0.1:${LLM_PORT}" >> /root/web.sh; fi >> /root/web.sh'
+RUN bash -c 'chmod oug+x ./web.sh'
 
 RUN rm -f ./llm
 
@@ -155,6 +162,7 @@ RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 2
 #RUN update-alternatives --config python3
 RUN update-alternatives --set python3 /usr/bin/python3.11
 RUN pip install open-webui 
+
 
 # OLLAMA_BASE_URL=https://127.0.0.1:2022
 
