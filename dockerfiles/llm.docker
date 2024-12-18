@@ -127,7 +127,7 @@ RUN bash -c 'chmod oug+x ./llm.sh'
 
 ## WebUI Script 
 RUN bash -c 'echo "#/bin/bash > /root/web.sh"'  
-RUN bash -c 'source /root/llm ; if [[ $LLM_MODE -eq 1 ]]; then echo "export OLLAMA_BASE_URL=127.0.0.1:${LLM_PORT}" >> /root/web.sh; fi >> /root/web.sh'
+RUN bash -c 'source /root/llm ; if [[ $LLM_MODE -eq 1 ]]; then echo "export OLLAMA_BASE_URL=http://127.0.0.1:${LLM_PORT}" >> /root/web.sh; fi >> /root/web.sh'
 RUN bash -c 'chmod oug+x ./web.sh'
 
 RUN rm -f ./llm
@@ -162,8 +162,5 @@ RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 2
 #RUN update-alternatives --config python3
 RUN update-alternatives --set python3 /usr/bin/python3.11
 RUN pip install open-webui 
-
-
-# OLLAMA_BASE_URL=https://127.0.0.1:2022
 
 ENTRYPOINT [ "/bin/entrypoint" ]
