@@ -39,3 +39,11 @@ map("n", "<A-3>", "<cmd> tabnext 3 <CR>", { desc = "Tab 3" })
 map("n", "<A-4>", "<cmd> tabnext 4 <CR>", { desc = "Tab 4" })
 map("n", "<A-5>", "<cmd> tabnext 5 <CR>", { desc = "Tab 5" })
 map("n", "<A-6>", "<cmd> tabnext 6 <CR>", { desc = "Tab 6" })
+
+-- Toggle auto-formatting
+vim.api.nvim_create_user_command("ToggleAutoformat", function()
+  vim.g.autoformat = not vim.g.autoformat
+  print("Autoformat is now " .. (vim.g.autoformat and "enabled" or "disabled"))
+end, {})
+
+vim.api.nvim_set_keymap("n", "<leader>tt", ":ToggleAutoformat<CR>", { noremap = true, silent = true })
