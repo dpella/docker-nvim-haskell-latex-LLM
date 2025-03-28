@@ -32,6 +32,14 @@ You have all of NvChad with the addition of severals plugins and configurations 
 11. LLM Support (Ollama) with Mistral model (`<leader>ww`)
 12. Welcome screen of DPella (the company where I work)
 13. Toggle autoformat (`<leader>tt`)
+14. Adding symbols around a word `v iw S{` will take `foo` into `{ foo }`
+15. `viw` select the current word 
+15. `vi{` select the text around `{`
+16. `vac{` select the text around `{`, but including the brackets. It can be changed to `vac[` and so on
+17. `O` in visual mode changes to the other extreme
+18. `gq%` does autowrapped until finding character `%`
+19. `%` goes from an open marker (e.g., `{`) to the closing one
+20. `W` jumps to the next word with space. Useful when having `list.get(10)`
 
 All of the docker images will have a volume associated with it and mounted in `/vol`.
 This is the directory where you should put all your persisten data.
