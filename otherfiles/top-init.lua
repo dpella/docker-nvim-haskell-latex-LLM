@@ -38,4 +38,7 @@ vim.schedule(function()
   require "mappings"
 end)
 
+vim.opt.foldmethod = "indent"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.foldlevelstart = 99
 

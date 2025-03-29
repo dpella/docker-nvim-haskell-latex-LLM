@@ -12,7 +12,6 @@ You have all of NvChad with the addition of severals plugins and configurations 
 	- `<leader>ca` shows recommendations for the code 
 	- `<leader>dd` shows the error/suggestion 
 	- `<leader>rr` evaluate the expression under `-- >>>`
-	- `<leader>rr` evaluate the expression under `-- >>>`
 	- `<leader>ra` evaluate all the expressions under `-- >>>`
 	- `<leader>rp` GHCi for the package 
 	- `<leader>rf` GHCi for the current file
@@ -40,6 +39,9 @@ You have all of NvChad with the addition of severals plugins and configurations 
 18. `gq%` does autowrapped until finding character `%`
 19. `%` goes from an open marker (e.g., `{`) to the closing one
 20. `W` jumps to the next word with space. Useful when having `list.get(10)`
+21. `Ctrl+w` for all windows related things (resize, swap, etc.)
+22. `:tabe .` to select a file an open it in a different tab
+23. `za` folds/opens code
 
 All of the docker images will have a volume associated with it and mounted in `/vol`.
 This is the directory where you should put all your persisten data.
