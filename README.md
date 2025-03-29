@@ -42,6 +42,7 @@ You have all of NvChad with the addition of severals plugins and configurations 
 21. `Ctrl+w` for all windows related things (resize, swap, etc.)
 22. `:tabe .` to select a file an open it in a different tab
 23. `za` folds/opens code
+24. If something is not working, write `:checkhealth` for the whole nvim, or `:checkhealth <pluginname>`
 
 All of the docker images will have a volume associated with it and mounted in `/vol`.
 This is the directory where you should put all your persisten data.
