@@ -82,6 +82,7 @@ RUN apt-get update \
 	fd-find \ 
 	luarocks 
 	# cargo \
+	# nodejs \
 # Set up environment variables for NVM
 ENV NVM_DIR=/root/.nvm
 ENV NODE_VERSION=18
