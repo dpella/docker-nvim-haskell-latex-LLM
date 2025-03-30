@@ -81,8 +81,7 @@ RUN apt-get update \
 	openjdk-11-jdk \
 	fd-find \ 
 	luarocks 
-	# cargo \
-	# nodejs \
+
 # Set up environment variables for NVM
 ENV NVM_DIR=/root/.nvm
 ENV NODE_VERSION=18
@@ -97,12 +96,6 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | b
 
 # Make node, npm, and tree-sitter available globally
 ENV PATH="$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH"
-# Latest rust compiler
-
-# Tree-sitter (parsers)
-# RUN cargo install tree-sitter-cli --version 0.22.6 # Otherwise, it requires the latest version of rust not yet in .deb
-# RUN cargo install tree-sitter-cli 
-# ENV PATH="${WORKINGDIR}/.cargo/bin:$PATH"
 
 RUN luarocks install jsregexp
 
@@ -191,7 +184,6 @@ RUN cabal install fast-tags
 # Hoogle has currently a bug so we need to install it from the repo
 
 RUN git clone https://github.com/ndmitchell/hoogle.git 
-# RUN sed -i 's/crypton-connection/crypton-connection == 0.3.2/g' ${WORKINGDIR}/hoogle/hoogle.cabal 
 RUN cd hoogle && cabal install 
 RUN hoogle generate 
 RUN rm -fr hoogle 
