@@ -1,4 +1,3 @@
-# Base the image on Ubuntu 20.04 
 FROM ubuntu:22.04 
 
 # Image metadata
@@ -76,7 +75,6 @@ RUN apt-get update \
 	coreutils \
 	unzip \
 	locales \
-	nodejs \
 	npm \
 	ripgrep \
 	dbus-x11 \
@@ -84,15 +82,26 @@ RUN apt-get update \
 	fd-find \ 
 	luarocks 
 	# cargo \
+# Set up environment variables for NVM
+ENV NVM_DIR=/root/.nvm
+ENV NODE_VERSION=18
 
+# Install NVM and Node.js
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && \
+    . "$NVM_DIR/nvm.sh" && \
+    nvm install $NODE_VERSION && \
+    nvm alias default $NODE_VERSION && \
+    nvm use $NODE_VERSION && \
+    npm install -g tree-sitter-cli
+
+# Make node, npm, and tree-sitter available globally
+ENV PATH="$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH"
 # Latest rust compiler
-RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
-ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Tree-sitter (parsers)
-RUN cargo install tree-sitter-cli --version 0.22.6 # Otherwise, it requires the latest version of rust not yet in .deb
+# RUN cargo install tree-sitter-cli --version 0.22.6 # Otherwise, it requires the latest version of rust not yet in .deb
 # RUN cargo install tree-sitter-cli 
-ENV PATH="${WORKINGDIR}/.cargo/bin:$PATH"
+# ENV PATH="${WORKINGDIR}/.cargo/bin:$PATH"
 
 RUN luarocks install jsregexp
 
