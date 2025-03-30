@@ -75,7 +75,6 @@ RUN apt-get update \
     bat \
 	coreutils \
 	unzip \
-	cargo \
 	locales \
 	nodejs \
 	npm \
@@ -84,7 +83,16 @@ RUN apt-get update \
 	openjdk-11-jdk \
 	fd-find \ 
 	luarocks 
+	# cargo \
 
+# Latest rust compiler
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+# Tree-sitter (parsers)
+RUN cargo install tree-sitter-cli --version 0.22.6 # Otherwise, it requires the latest version of rust not yet in .deb
+# RUN cargo install tree-sitter-cli 
+ENV PATH="${WORKINGDIR}/.cargo/bin:$PATH"
 
 RUN luarocks install jsregexp
 
@@ -201,18 +209,15 @@ RUN curl -fsSL https://ollama.com/install.sh | sh
 # NEO Vim 
 ##
 
-RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+ENV NVIM="nvim-linux-x86_64"
+RUN curl -LO https://github.com/neovim/neovim/releases/download/v0.11.0/${NVIM}.tar.gz
 RUN rm -rf /opt/nvim
-RUN tar -C /opt -xzf nvim-linux64.tar.gz
-RUN rm ${WORKINGDIR}/nvim-linux64.tar.gz
-RUN echo 'export PATH="$PATH:/opt/nvim-linux64/bin"' >> ${WORKINGDIR}/.bashrc
+RUN tar -C /opt -xzf ${NVIM}.tar.gz 
+RUN rm ${WORKINGDIR}/${NVIM}.tar.gz
+RUN echo 'export PATH="$PATH:/opt/${NVIM}/bin"' >> ${WORKINGDIR}/.bashrc
 
 # NVChad (IDE based on NeoVIM) 
 RUN git clone https://github.com/NvChad/starter ${WORKINGDIR}/.config/nvim
-
-# Tree-sitter (parsers)
-RUN cargo install tree-sitter-cli --version 0.22.6 # Otherwise, it requires the latest version of rust not yet in .deb
-ENV PATH="${WORKINGDIR}/.cargo/bin:$PATH"
 
 # Locale 
 RUN locale-gen en_US.UTF-8
@@ -229,12 +234,12 @@ COPY ./otherfiles/conform.lua    ${WORKINGDIR}/.config/nvim/lua/configs/
 COPY ./otherfiles/lspconfig.lua  ${WORKINGDIR}/.config/nvim/lua/configs/
 
 # Installing plugins NEOVIM  
-RUN /opt/nvim-linux64/bin/nvim -c "silent! PlugInstall" +qall
+RUN /opt/${NVIM}/bin/nvim -c "silent! PlugInstall" +qall
 # Installing language servers and formatters NEOVIM 
-RUN /opt/nvim-linux64/bin/nvim --headless +"MasonUpdate" +q
-RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall marksman stylua lua-language-server prettier@2.8.8" +q
-RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall ltex-ls texlab" +q 
-RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall pylsp" +q 
+RUN /opt/${NVIM}/bin/nvim --headless +"MasonUpdate" +q
+RUN /opt/${NVIM}/bin/nvim --headless +"MasonInstall marksman stylua lua-language-server prettier@2.8.8" +q
+RUN /opt/${NVIM}/bin/nvim --headless +"MasonInstall ltex-ls texlab" +q 
+# RUN /opt/${NVIM}/bin/nvim --headless +"MasonInstall pylsp" +q 
 
 ##
 # Clipboard from docker into WSL 
@@ -242,7 +247,7 @@ RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall pylsp" +q
 RUN apt-get update && apt-get install -y xclip 
 
 # Installing Haskell language server
-RUN /opt/nvim-linux64/bin/nvim --headless +"MasonInstall fourmolu" +q 
+RUN /opt/${NVIM}/bin/nvim --headless +"MasonInstall fourmolu" +q 
 
 # File format options for Haskell code 
 COPY ./otherfiles/fourmolu.yaml  ${WORKINGDIR}
