@@ -307,4 +307,10 @@ RUN pip install scipy
 # Miscelaneous (PDF tools and graphic tools)
 RUN apt-get update && apt-get install -y pdftk evince inkscape lhs2tex
 
+# Error with toggle (hack to fix it)
+# https://github.com/NvChad/base46/issues/325
+# local old_theme = chadrc.base46.theme
+# /root/.local/share/nvim/lazy/base46/lua/base46/init.lua
+RUN sed -i 's|local old_theme = chadrc.base46.theme|local old_theme = chadrc.ui.theme or chadrc.base46.theme|' /root/.local/share/nvim/lazy/base46/lua/base46/init.lua
+
 ENTRYPOINT [ "/bin/entrypoint" ]
