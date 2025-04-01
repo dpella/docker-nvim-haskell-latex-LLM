@@ -2,11 +2,10 @@ return {
   {
     "stevearc/conform.nvim",
     event = "BufWritePre", -- uncomment for format on save
-    config = function()
-      require "configs.conform"
-    end,
+    opts = require "configs.conform",
   },
 
+  -- Tree sitter
   {
     "nvim-treesitter/nvim-treesitter",
     opts = {
@@ -19,51 +18,17 @@ return {
         "markdown",
         "latex",
         "bibtex",
-
         -- web dev
         "html",
         "css",
         "javascript",
         "typescript",
         "tsx",
-
         -- low level
         "c",
         "zig",
       },
     },
-  },
-
-  -- It describes what to install when running :MasonInstallAll
-  {
-    "williamboman/mason.nvim",
-    dependencies = { "williamboman/mason-lspconfig.nvim" },
-    config = function()
-      local mason = require "mason"
-      local mason_lspconfig = require "mason-lspconfig"
-
-      mason.setup()
-
-      mason_lspconfig.setup {
-        ensure_installed = {
-          "lua_ls", -- Lua
-          "hls", -- Haskell
-          "marksman", -- Markdown
-          "texlab", -- Latex
-          "ltex", -- Grammar checking
-        },
-        automatic_instalation = true,
-      }
-    end,
-  },
-
-  -- These are some examples, uncomment them if you want to see them work!
-  {
-    "neovim/nvim-lspconfig",
-    config = function()
-      require("nvchad.configs.lspconfig").defaults()
-      require "configs.lspconfig"
-    end,
   },
 
   -- Maximizes a split for a moment
@@ -107,15 +72,18 @@ return {
     event = "BufReadPost",
   },
 
-  -- To surround text and then add quotes like "", e.g., config ysiw" -> "config"
+  -- Lazygit
   {
-    "kylechui/nvim-surround",
-    event = { "BufReadPre", "BufNewFile" },
-    version = "*",
-    config = true,
+    "kdheepak/lazygit.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    keys = {
+      { "<leader>gg", "<cmd>LazyGit<CR>", desc = "Lazy Git" },
+    },
   },
 
-  -- Sessions
+  -- Session manager <leader> z
   {
     "Shatur/neovim-session-manager",
     event = "VimEnter",
@@ -123,6 +91,14 @@ return {
       require("session_manager").setup {
         autoload_mode = require("session_manager.config").AutoloadMode.Disabled, -- CurrentDir,
       }
+    end,
+  },
+
+  -- These are some examples, uncomment them if you want to see them work!
+  {
+    "neovim/nvim-lspconfig",
+    config = function()
+      require "configs.lspconfig"
     end,
   },
 
@@ -148,30 +124,7 @@ return {
     end,
   },
 
-  -- Git
-  {
-    "kdheepak/lazygit.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-    },
-    keys = {
-      { "<leader>gg", "<cmd>LazyGit<CR>", desc = "Lazy Git" },
-    },
-  },
-
-  -- Multi-cursor
-  {
-    "mg979/vim-visual-multi",
-    lazy = false,
-    branch = "master",
-    init = function()
-      vim.g.VM_maps = {
-        ["Find Under"] = "<C-m>",
-      }
-    end,
-  },
-
-  -- Telescope search for bibtex entries <C-e>
+  -- Telescope search for bibtex entries <leader> bb
   {
     "nvim-telescope/telescope-bibtex.nvim",
     dependencies = { "nvim-telescope/telescope.nvim" },
@@ -180,30 +133,29 @@ return {
     end,
   },
 
-  -- AI - LLM
-  {
-    "David-Kunz/gen.nvim",
-    lazy = false,
-    opts = {
-      model = "mistral:instruct",
-      port = "2022",
-      -- show_model = true,
-    },
-    -- keys = {
-    --   { "<leader>ww", "<cmd>Gen<CR>", desc = "LLM Prompt" },
-    -- },
-  },
   -- LTex Extras (like adding word to a dictionary)
+  -- <leader> ca
   {
     "barreiroleo/ltex-extra.nvim",
   },
+
   -- Haskell tools
   {
     "mrcjkb/haskell-tools.nvim",
     version = "^3", -- Recommended
     lazy = false, -- This plugin is already lazy
   },
-  -- Renaming
+
+  -- Markdown (:Mtoc)
+  {
+    "hedyhli/markdown-toc.nvim",
+    ft = "markdown", -- Lazy load on markdown filetype
+    config = function()
+      require("mtoc").setup {}
+    end,
+  },
+
+  --	Renaming (<leader> re)
   {
     "smjonas/inc-rename.nvim",
     config = function()
@@ -212,12 +164,14 @@ return {
     lazy = false,
   },
 
- {
-    "hedyhli/markdown-toc.nvim",
-    ft = "markdown", -- Lazy load on markdown filetype
-    config = function()
-      require("mtoc").setup {}
-    end,
+  -- AI
+  {
+    "David-Kunz/gen.nvim",
+    lazy = false,
+    opts = {
+      model = "mistral:instruct",
+      port = "2022",
+      show_model = true,
+    },
   },
-
 }
