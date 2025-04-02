@@ -174,4 +174,11 @@ return {
       show_model = true,
     },
   },
+
+  -- Harpoon, to do marks in files
+  {
+    "ThePrimeagen/harpoon",
+    branch = "harpoon2",
+    dependencies = { "nvim-lua/plenary.nvim" },
+  },
 }

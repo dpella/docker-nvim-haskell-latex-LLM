@@ -31,3 +31,23 @@ map("n", "<leader>re", ":IncRename ", { desc = "LSP: Smart renaming" })
 
 -- LLM
 map({ "n", "v" }, "<leader>ww", ":Gen<CR>", { desc = "LLM Prompt" })
+
+-- Harpoon
+local harpoon = require "harpoon"
+harpoon:setup()
+
+map({ "n" }, "<leader>ha", function()
+  harpoon:list():add()
+end, { desc = "Harpoon: add into the list" })
+
+map({ "n" }, "<leader>ht", function()
+  harpoon.ui:toggle_quick_menu(harpoon:list())
+end, { desc = "Harpoon: toogle list" })
+
+map({ "n" }, "<leader>hp", function()
+  harpoon:list():prev()
+end, { desc = "Harpoon: prev" })
+
+map({ "n" }, "<leader>hn", function()
+  harpoon:list():next()
+end, { desc = "Harpoon: next" })
