@@ -92,7 +92,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
-local servers = { "ltex", "lua_ls", "marksman", "texlab", "html", "cssls" }
+local servers = { "lua_ls", "marksman", "texlab", "html", "cssls" }
 local nvlsp = require "nvchad.configs.lspconfig"
 
 -- lsps with default config
@@ -103,6 +103,20 @@ for _, lsp in ipairs(servers) do
     capabilities = nvlsp.capabilities,
   }
 end
+
+-- For ltex extension to add to dictionaries
+local on_attach = require("nvchad.configs.lspconfig").on_attach
+local on_init = require("nvchad.configs.lspconfig").on_init
+local capabilities = require("nvchad.configs.lspconfig").capabilities
+
+lspconfig["ltex"].setup {
+  on_attach = function(client, bufnr)
+    require("ltex_extra").setup()
+    on_attach(client, bufnr)
+  end,
+  on_init = on_init,
+  capabilities = capabilities,
+}
 
 -- configuring single server, example: typescript
 -- lspconfig.ts_ls.setup {
