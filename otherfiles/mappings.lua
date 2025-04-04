@@ -51,3 +51,33 @@ end, { desc = "Harpoon: prev" })
 map({ "n" }, "<leader>hn", function()
   harpoon:list():next()
 end, { desc = "Harpoon: next" })
+
+map("n", "<leader>h1", function()
+  harpoon:list():select(1)
+end, { desc = "Harpoon: 1" })
+
+map("n", "<leader>h2", function()
+  harpoon:list():select(2)
+end, { desc = "Harpoon: 2" })
+
+map("n", "<leader>h3", function()
+  harpoon:list():select(3)
+end, { desc = "Harpoon: 3" })
+
+map("n", "<leader>h4", function()
+  harpoon:list():select(4)
+end, { desc = "Harpoon: 4" })
+
+-- When selecting lines, moving them up or down
+map("v", "J", ":m '>+1<CR>gv=gv")
+map("v", "K", ":m '<-2<CR>gv=gv")
+
+-- Half page scrolling without moving the cursor
+map("n", "<C-d>", "<C-d>zz")
+map("n", "<C-u>", "<C-u>zz")
+
+-- Joining lines without moving cursor
+map("n", "J", "mzJ`z")
+
+-- Replace every word under the cursor
+map("n", "<leader>s", ":%s/\\<<C-r><C-w>\\>//g<left><left>")
