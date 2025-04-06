@@ -81,3 +81,16 @@ map("n", "J", "mzJ`z")
 
 -- Replace every word under the cursor
 map("n", "<leader>s", ":%s/\\<<C-r><C-w>\\>//g<left><left>")
+
+-- Haskell
+map("n", "<leader>fcg", "<cmd> Telescope ht package_grep <CR>", { desc = "Live grep within (sub) cabal packages" })
+
+map("n", "<leader>fcf", "<cmd> Telescope ht package_files <CR>", { desc = "Search files within (sub) cabal packages" })
+
+map(
+  "n",
+  "<leader>fho",
+  "<cmd> Telescope ht hoogle_signature <CR>",
+  { desc = "Run a Hoogle search for the type signature under the cursor" }
+)
+ 
