@@ -168,15 +168,15 @@ return {
   },
 
   -- AI
-  {
-    "David-Kunz/gen.nvim",
-    lazy = false,
-    opts = {
-      model = "mistral:instruct",
-      port = "2022",
-      show_model = true,
-    },
-  },
+  -- {
+  --   "David-Kunz/gen.nvim",
+  --   lazy = false,
+  --  opts = {
+  --    model = "mistral:instruct",
+  --    port = "2022",
+  --    show_model = true,
+  --  },
+  -- },
 
   -- Harpoon, to do marks in files
   {

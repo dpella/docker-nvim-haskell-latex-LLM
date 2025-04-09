@@ -30,7 +30,7 @@ map("n", "<leader>bb", "<cmd> Telescope bibtex <CR>", { desc = "Tex: Search BibT
 map("n", "<leader>re", ":IncRename ", { desc = "LSP: Smart renaming" })
 
 -- LLM
-map({ "n", "v" }, "<leader>ww", ":Gen<CR>", { desc = "LLM Prompt" })
+-- map({ "n", "v" }, "<leader>ww", ":Gen<CR>", { desc = "LLM Prompt" })
 
 -- Harpoon
 local harpoon = require "harpoon"
