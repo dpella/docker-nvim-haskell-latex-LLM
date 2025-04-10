@@ -57,10 +57,6 @@ if [ "${IMAGE}" = "neo-h" ]; then
     PORT_OPTION="-p 0.0.0.0:8000:8000"
 fi
 
-if [ "${IMAGE}" = "llm" ]; then
-    PORT_OPTION="-p 0.0.0.0:8080:8080"
-fi
-
 docker run --rm \
 	   -d   \
 	   --cpus="8" \

@@ -103,10 +103,10 @@ RUN cabal install fast-tags
 # The way to do it should be like this: RUN cabal install hoogle 
 # Hoogle has currently a bug so we need to install it from the repo
 
-# RUN git clone https://github.com/ndmitchell/hoogle.git 
-# RUN cd hoogle && cabal install 
-# RUN hoogle generate 
-# RUN rm -fr hoogle 
+RUN git clone https://github.com/ndmitchell/hoogle.git 
+RUN cd hoogle && cabal install 
+RUN hoogle generate 
+RUN rm -fr hoogle 
 
 ############################################### 
 # Powerline + Fuzzy Finder 
@@ -163,21 +163,6 @@ RUN rm -f cmd lazygit lazygit.tar.gz version
 # Clipboard from docker into WSL 
 ##
 RUN apt-get update && apt-get install -y xclip 
-
-############################################## 
-# AI (Ollama)
-############################################## 
-RUN curl -fsSL https://ollama.com/install.sh | sh
-
-## Setting up OLLAMA
-COPY ./ssh/llm ${WORKINGDIR}
-
-RUN bash -c 'echo "#/bin/bash > /root/llm.sh" ; source /root/llm ; if [[ $LLM_MODE -eq 0 ]]; then echo "ollama serve & sleep 10 && ollama pull mistral:instruct" >> /root/llm.sh; else echo ssh -o \"StrictHostKeyChecking no\" -N -L ${LLM_PORT}:${LLM_SERVER}:${LLM_PORT} ${SSH_USER}@${LLM_SERVER} -p ${SSH_PORT} \& >> /root/llm.sh ; fi' 
-
-RUN bash -c 'source /root/llm ; echo "export OLLAMA_HOST=\"127.0.0.1:${LLM_PORT}\" " >> /root/llm.sh'
-RUN bash -c 'chmod oug+x ./llm.sh'
-
-RUN rm -f ./llm
 
 ############################################## 
 # Utilities required by Neo Vim 
@@ -272,10 +257,6 @@ RUN /opt/${NVIM}/bin/nvim --headless +"MasonInstall fourmolu" +q
 COPY ./otherfiles/fourmolu.yaml  ${WORKINGDIR}
 RUN mv ${WORKINGDIR}/fourmolu.yaml ${WORKINGDIR}/.local/share/nvim/mason/bin/
 
-# Patch will NVim Plugin - It should be removed once the plugin gets fixed
-#RUN sed -i '338s/end_pos\[3\], lines)/end_pos\[3\]-1, lines)/' \
-#    ${WORKINGDIR}/.local/share/nvim/lazy/gen.nvim/lua/gen/init.lua
-
 ############################################## 
 # Tmux 
 ############################################## 
@@ -301,23 +282,17 @@ RUN apt-get update && apt-get install -y inetutils-ping
 # MkDocs
 ############################################## 
 
-# RUN apt-get update && apt-get install -y pip 
-# RUN pip install --upgrade Pygments
-# RUN pip install pymdown-extensions
-# RUN pip install mkdocs
+RUN apt-get update && apt-get install -y pip 
+RUN pip install --upgrade Pygments
+RUN pip install pymdown-extensions
+RUN pip install mkdocs
 
 # Tools for Python development 
 
-# RUN apt-get update && apt-get install python3.10-venv -y
-# RUN pip install scipy 
+RUN apt-get update && apt-get install python3.10-venv -y
+RUN pip install scipy 
 
 # Miscelaneous (PDF tools and graphic tools)
-# RUN apt-get update && apt-get install -y pdftk evince inkscape lhs2tex
-
-# Error with toggle (hack to fix it)
-# https://github.com/NvChad/base46/issues/325
-# local old_theme = chadrc.base46.theme
-# /root/.local/share/nvim/lazy/base46/lua/base46/init.lua
-# RUN sed -i 's|local old_theme = chadrc.base46.theme|local old_theme = chadrc.ui.theme or chadrc.base46.theme|' /root/.local/share/nvim/lazy/base46/lua/base46/init.lua
+RUN apt-get update && apt-get install -y pdftk evince inkscape lhs2tex
 
 ENTRYPOINT [ "/bin/entrypoint" ]

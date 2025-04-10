@@ -28,20 +28,23 @@ You have all of NvChad with the addition of severals plugins and configurations 
 - Global rename (position in a word and hit `<leader>s`)
 - Keeping tracks of comments of the form `TODO:`, `HACK:`, and `BUG:` (`]t` and `[t` for next an prev comment)
 - Save and restore sessions (`<leader> z`)
-- LLM Support (OpenAI) with Avante (`<leader>at` toggle prompt, `<leader>aa` to ask, `<leader ae>` to directly edit) 
+- LLM Support (OpenAI) 
+	- with Avante (`<leader>at` toggle prompt, `<leader>aa` to ask, `<leader ae>` to directly edit) 
 - Welcome screen of DPella (the company where I work)
-- Adding symbols around a word `viw S{` will take `foo` into `{ foo }`
-- `viw` select the current word 
-- `vi{` select the text around `{`
-- `vac{` select the text around `{`, but including the brackets. It can be changed to `vac[` and so on
-- `O` in visual mode changes to the other extreme
-- `gq%` does autowrapped until finding character `%`
-- `%` goes from an open marker (e.g., `{`) to the closing one
-- `W` jumps to the next word with space. Useful when having `list.get(10)`
+- Editing tips
+	- `viw` select the current word 
+	- `vi{` select the text around `{`
+	- `vac{` select the text around `{`, but including the brackets. It can be changed to `vac[` and so on
+	- `O` in visual mode changes to the other extreme
+	- `gq%` does autowrapped until finding character `%`
+	- `%` goes from an open marker (e.g., `{`) to the closing one
+	- `W` jumps to the next word with space. Useful when having `list.get(10)`
 - `Ctrl+w` for all windows related things (resize, swap, etc.)
 - `:tabe .` to select a file an open it in a different tab
 - `za` folds/opens code
 - If something is not working, write `:checkhealth` for the whole nvim, or `:checkhealth <pluginname>`
+- Latex
+	- `<leader> bb` searching in bibliography
 
 All of the docker images will have a volume associated with it and mounted in `/vol`.
 This is the directory where you should put all your persisten data.
