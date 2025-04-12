@@ -295,4 +295,10 @@ RUN pip install scipy
 # Miscelaneous (PDF tools and graphic tools)
 RUN apt-get update && apt-get install -y pdftk evince inkscape lhs2tex
 
+# Autocomplete 
+RUN echo "deb [trusted=yes] https://apt.fury.io/rsteube/ /" | sudo tee /etc/apt/sources.list.d/rsteube.list 
+RUN apt-get update && apt-get install carapace-bin 
+RUN echo "export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'" >> ${WORKINGDIR}/.bashrc
+RUN echo "source <(carapace _carapace)" >> ${WORKINGDIR}/.bashrc
+
 ENTRYPOINT [ "/bin/entrypoint" ]
