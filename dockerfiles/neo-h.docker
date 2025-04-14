@@ -310,4 +310,7 @@ RUN chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
 RUN apt update && apt install -y eza
 RUN echo "alias ls='eza -l --icons --git -a'" >> ${WORKINGDIR}/.bashrc
 
+# FZF keyshort 
+RUN echo 'eval "$(fzf --bash)"' >> ${WORKINGDIR}/.bashrc
+
 ENTRYPOINT [ "/bin/entrypoint" ]
