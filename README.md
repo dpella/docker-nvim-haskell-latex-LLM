@@ -39,6 +39,11 @@ You have all of NvChad with the addition of severals plugins and configurations 
 	- `gq%` does autowrapped until finding character `%`
 	- `%` goes from an open marker (e.g., `{`) to the closing one
 	- `W` jumps to the next word with space. Useful when having `list.get(10)`
+        - `M` puts the cursor at the middle of the screen
+        - `zz` puts the current line in the middle 
+        - `f<character>` finds the next `<character>` in the current line, `F<character>` does it backwards. 
+          `;` repeats the find and `,` in opposite direction
+
 - `Ctrl+w` for all windows related things (resize, swap, etc.)
 - `:tabe .` to select a file an open it in a different tab
 - `za` folds/opens code
