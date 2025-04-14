@@ -1,4 +1,4 @@
 
 # To preview text files
-export FZF_DEFAULT_OPTS="--preview 'batcat --color=always {} | head -500'"
+export FZF_DEFAULT_OPTS="--preview 'batcat -p --color=always {} | head -500'"
 

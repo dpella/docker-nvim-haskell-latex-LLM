@@ -301,4 +301,13 @@ RUN apt-get update && apt-get install carapace-bin
 RUN echo "export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'" >> ${WORKINGDIR}/.bashrc
 RUN echo "source <(carapace _carapace)" >> ${WORKINGDIR}/.bashrc
 
+# Eza (modern ls)
+RUN apt update && apt install -y gpg
+RUN mkdir -p /etc/apt/keyrings
+RUN wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+RUN echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
+RUN chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+RUN apt update && apt install -y eza
+RUN echo "alias ls='eza -l --icons --git -a'" >> ${WORKINGDIR}/.bashrc
+
 ENTRYPOINT [ "/bin/entrypoint" ]
