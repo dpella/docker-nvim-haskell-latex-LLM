@@ -125,7 +125,7 @@ RUN cat ${WORKINGDIR}/powerline >> ${WORKINGDIR}/.bashrc && rm ${WORKINGDIR}/pow
 RUN mv ${WORKINGDIR}/default.twolines.json /usr/share/powerline/config_files/themes/shell
 RUN sed -i 's/default_leftonly/default.twolines/g' /usr/share/powerline/config_files/config.json
 
-RUN echo "alias less=batcat" >> ${WORKINGDIR}/.bashrc 
+RUN echo "alias less='batcat -p'" >> ${WORKINGDIR}/.bashrc 
 RUN echo 'eval $(ssh-agent)' >> ${WORKINGDIR}/.bashrc
 
 # Fuzzy find filer
