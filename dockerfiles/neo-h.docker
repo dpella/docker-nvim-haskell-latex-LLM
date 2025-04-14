@@ -308,7 +308,8 @@ RUN wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc |
 RUN echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
 RUN chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
 RUN apt update && apt install -y eza
-RUN echo "alias ls='eza -l --icons --git -a'" >> ${WORKINGDIR}/.bashrc
+RUN echo "alias ls='eza --icons --git -a'" >> ${WORKINGDIR}/.bashrc
+RUN echo "alias ll='eza -l --icons --git -a'" >> ${WORKINGDIR}/.bashrc
 
 # FZF keyshort 
 RUN echo 'eval "$(fzf --bash)"' >> ${WORKINGDIR}/.bashrc
