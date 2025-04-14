@@ -94,3 +94,5 @@ map(
   { desc = "Run a Hoogle search for the type signature under the cursor" }
 )
  
+-- Noice disregard messages
+map("n", "<leader>nd", "<cmd>NoiceDismiss<CR>", { desc = "Dismiss Noice message" })
