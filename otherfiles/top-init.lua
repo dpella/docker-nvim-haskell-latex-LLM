@@ -24,3 +24,5 @@ require("noice").setup {
   },
 }
 
+require "custom.autocmds"
+

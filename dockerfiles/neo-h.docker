@@ -245,6 +245,10 @@ COPY ./otherfiles/lspconfig.lua  ${WORKINGDIR}/.config/nvim/lua/configs/
 # Look of NvChad
 COPY ./otherfiles/chadrc.lua     ${WORKINGDIR}/.config/nvim/lua/
 
+# Options per kind of files 
+RUN mkdir ${WORKINGDIR}/.config/nvim/lua/custom/
+COPY ./otherfiles/autocmds.lua ${WORKINGDIR}/.config/nvim/lua/custom/
+
 # Installing plugins NEOVIM  
 RUN /opt/${NVIM}/bin/nvim -c "silent! PlugInstall" +qall
 # Installing language servers and formatters NEOVIM 
