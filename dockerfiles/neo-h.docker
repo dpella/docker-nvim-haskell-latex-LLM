@@ -311,6 +311,9 @@ RUN apt update && apt install -y eza
 RUN echo "alias ls='eza --icons --git -a'" >> ${WORKINGDIR}/.bashrc
 RUN echo "alias ll='eza -l --icons --git -a'" >> ${WORKINGDIR}/.bashrc
 
+# VIM motions in bash 
+RUN echo "set -o vi" >> ${WORKINGDIR}/.bashrc
+
 # FZF keyshort 
 RUN echo 'eval "$(fzf --bash)"' >> ${WORKINGDIR}/.bashrc
 
