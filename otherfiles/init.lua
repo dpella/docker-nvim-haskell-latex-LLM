@@ -261,4 +261,9 @@ return {
       },
     },
   },
+  {
+    -- Tmux navigator, to move in and out of nvim to terminal
+    "christoomey/vim-tmux-navigator",
+    lazy = false, -- always load this plugin
+  },
 }

@@ -96,3 +96,9 @@ map(
  
 -- Noice disregard messages
 map("n", "<leader>nd", "<cmd>NoiceDismiss<CR>", { desc = "Dismiss Noice message" })
+
+-- Override nvchad's navigation settings for tmux-vim-navigor to work in nvim
+map("n", "<C-h>", "<cmd> TmuxNavigateLeft<CR>", { desc = "window left" })
+map("n", "<C-l>", "<cmd> TmuxNavigateRight<CR>", { desc = "window right" })
+map("n", "<C-j>", "<cmd> TmuxNavigateDown<CR>", { desc = "window down" })
+map("n", "<C-k>", "<cmd> TmuxNavigateUp<CR>", { desc = "window up" }) 
