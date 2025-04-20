@@ -305,6 +305,19 @@ RUN apt-get update && apt-get install carapace-bin
 RUN echo "export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'" >> ${WORKINGDIR}/.bashrc
 RUN echo "source <(carapace _carapace)" >> ${WORKINGDIR}/.bashrc
 
+# Modern PS (btm) 
+RUN curl -LO https://github.com/ClementTsang/bottom/releases/download/0.10.2/bottom_0.10.2-1_amd64.deb
+RUN dpkg -i bottom_0.10.2-1_amd64.deb
+RUN rm bottom_0.10.2-1_amd64.deb
+
+# Modern df (duf) 
+RUN apt-get update && apt-get install duf 
+
+# Modern du (dust)
+RUN culr -LO https://github.com/bootandy/dust/releases/download/v1.2.0/du-dust_1.2.0-1_amd64.deb
+RUN dpkg -i du-dust_1.2.0-1_amd64.deb
+RUN rm du-dust_1.2.0-1_amd64.deb
+
 # Eza (modern ls)
 RUN apt update && apt install -y gpg
 RUN mkdir -p /etc/apt/keyrings
