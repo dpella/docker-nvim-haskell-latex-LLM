@@ -32,6 +32,7 @@ You have all of NvChad with the addition of severals plugins and configurations 
 	- with Avante (`<leader>at` toggle prompt, `<leader>aa` to ask, `<leader ae>` to directly edit) 
 - Welcome screen of DPella (the company where I work)
 - Editing tips
+	- `<C-\><C-n>` to get out of the terminal mode back into nvim 
 	- `viw` select the current word 
 	- `vi{` select the text around `{`
 	- `vac{` select the text around `{`, but including the brackets. It can be changed to `vac[` and so on
