@@ -116,6 +116,12 @@ lspconfig["ltex"].setup {
   end,
   on_init = on_init,
   capabilities = capabilities,
+  settings = {
+    ltex = {
+      checkFrequency = "save",
+      language = "en-US",
+    },
+  },
 }
 
 -- configuring single server, example: typescript
