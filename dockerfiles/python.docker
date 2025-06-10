@@ -1,0 +1,268 @@
+# Use the official Python 3.11 slim image
+FROM python:3.11-slim
+
+# Image metadata
+LABEL maintainer="alejandro@dpella.io"
+LABEL version="0.2"
+LABEL description="GHC for development"
+
+# Set the timezone so apt-get doesn't ask for it later
+ENV TZ=Europe/Stockholm
+ENV WORKINGDIR=/root
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Install base system utilities and dependencies
+RUN apt-get update \ 
+    && \
+    apt-get install -y --no-install-recommends \
+         software-properties-common \ 
+         sudo \ 
+         ssh  \
+         git  \
+         wget \ 
+         curl \ 
+         make \ 
+         lzma \ 
+         libnuma-dev \
+         zlib1g-dev \
+	 libgmp-dev \
+	 libgmp10 \
+         liblzma-dev \ 
+	 gcc \
+	 autoconf \
+	 automake \
+	 gpg \
+         dirmngr \
+	 build-essential \
+       	 lsb-release \
+         gnupg2 \ 
+	 socat  
+
+RUN apt-get update \
+    && \
+    apt-get install -y \
+        powerline \ 
+        less \
+    && \
+    touch ~/.ssh/known_hosts \
+    && \ 
+    ssh-keyscan github.com >> ~/.ssh/known_hosts 
+
+ 
+ 
+############################################### 
+# Powerline + Fuzzy Finder 
+############################################## 
+
+# Copy activation lines for powerfile 
+COPY ./otherfiles/powerline ${WORKINGDIR}
+
+# Two lines  
+COPY ./otherfiles/default.twolines.json ${WORKINGDIR}
+
+# Activate powerline 
+RUN cat ${WORKINGDIR}/powerline >> ${WORKINGDIR}/.bashrc && rm ${WORKINGDIR}/powerline 
+
+# Activate two lines powerline 
+RUN mv ${WORKINGDIR}/default.twolines.json /usr/share/powerline/config_files/themes/shell
+RUN sed -i 's/default_leftonly/default.twolines/g' /usr/share/powerline/config_files/config.json
+
+RUN echo "alias less='batcat -p'" >> ${WORKINGDIR}/.bashrc 
+RUN echo 'eval $(ssh-agent)' >> ${WORKINGDIR}/.bashrc
+
+# Fuzzy find filer
+RUN git clone --depth 1 https://github.com/junegunn/fzf.git ${WORKINGDIR}/.fzf
+
+WORKDIR ${WORKINGDIR}/.fzf
+
+RUN ./install --all  
+
+COPY ./otherfiles/fzf ${WORKINGDIR}
+RUN cat ${WORKINGDIR}/fzf >> ${WORKINGDIR}/.bashrc && rm ${WORKINGDIR}/fzf 
+
+WORKDIR ${WORKINGDIR}
+
+############################################## 
+# GIT + Lazygit 
+############################################## 
+
+RUN echo '/usr/bin/ssh-add /root/.ssh/key' >> ${WORKINGDIR}/.bashrc
+COPY ./ssh/gituser ${WORKINGDIR} 
+RUN cat ${WORKINGDIR}/gituser >> ${WORKINGDIR}/.bashrc 
+RUN rm -f ${WORKINGDIR}/gituser 
+
+## Lazygit (visual aid for git)
+RUN curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*' > version
+RUN echo -n 'curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_' > cmd
+RUN echo -n $(cat version) >> cmd
+RUN echo -n '_Linux_x86_64.tar.gz"' >> cmd
+RUN cat cmd | /bin/sh
+RUN tar xf lazygit.tar.gz lazygit
+RUN install lazygit /usr/local/bin
+RUN rm -f cmd lazygit lazygit.tar.gz version
+
+##
+# Clipboard from docker into WSL 
+##
+RUN apt-get update && apt-get install -y xclip 
+
+############################################## 
+# Utilities required by Neo Vim 
+############################################## 
+
+RUN apt-get update \
+    && \
+    apt-get install -y \
+	trash-cli \
+    tldr \
+    bat \
+	coreutils \
+	unzip \
+	locales \
+	npm \
+	ripgrep \
+	dbus-x11 \
+	fd-find \ 
+	luarocks 
+
+	# openjdk-11-jdk \
+
+# Set up environment variables for NVM
+ENV NVM_DIR=/root/.nvm
+ENV NODE_VERSION=18
+
+# Install NVM and Node.js
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && \
+    . "$NVM_DIR/nvm.sh" && \
+    nvm install $NODE_VERSION && \
+    nvm alias default $NODE_VERSION && \
+    nvm use $NODE_VERSION && \
+    npm install -g tree-sitter-cli
+
+# Make node, npm, and tree-sitter available globally
+ENV PATH="$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH"
+
+RUN luarocks install jsregexp
+
+############################################## 
+# Neo Vim + NvChad
+############################################## 
+
+ENV NVIM="nvim-linux-x86_64"
+RUN curl -LO https://github.com/neovim/neovim/releases/download/v0.11.0/${NVIM}.tar.gz
+RUN rm -rf /opt/nvim
+RUN tar -C /opt -xzf ${NVIM}.tar.gz 
+RUN rm ${WORKINGDIR}/${NVIM}.tar.gz
+RUN echo 'export PATH="$PATH:/opt/${NVIM}/bin"' >> ${WORKINGDIR}/.bashrc
+
+# NVChad (IDE based on NeoVIM) 
+RUN git clone https://github.com/NvChad/starter ${WORKINGDIR}/.config/nvim
+
+# Locale 
+RUN locale-gen en_US.UTF-8
+RUN update-locale
+ENV LANG=en_US.UTF-8
+
+# Configuration for NvChad 
+
+# Top-level init
+COPY ./otherfiles/top-init.lua   ${WORKINGDIR}/.config/nvim/init-add.lua
+RUN cat ${WORKINGDIR}/.config/nvim/init-add.lua >> ${WORKINGDIR}/.config/nvim/init.lua
+RUN rm -f ${WORKINGDIR}/.config/nvim/init-add.lua
+
+# Options
+COPY ./otherfiles/options.lua    ${WORKINGDIR}/.config/nvim/lua/
+
+# Autoformatting 
+COPY ./otherfiles/conform.lua    ${WORKINGDIR}/.config/nvim/lua/configs/
+
+# Plugins
+COPY ./otherfiles/init.lua       ${WORKINGDIR}/.config/nvim/lua/plugins/
+
+# Key bindings
+COPY ./otherfiles/mappings.lua   ${WORKINGDIR}/.config/nvim/lua/
+
+# LSP Config (key bindings)
+COPY ./otherfiles/lspconfig.lua  ${WORKINGDIR}/.config/nvim/lua/configs/
+
+# Look of NvChad
+COPY ./otherfiles/chadrc.lua     ${WORKINGDIR}/.config/nvim/lua/
+
+# Options per kind of files 
+RUN mkdir ${WORKINGDIR}/.config/nvim/lua/custom/
+COPY ./otherfiles/autocmds.lua ${WORKINGDIR}/.config/nvim/lua/custom/
+
+# Installing plugins NEOVIM  
+RUN /opt/${NVIM}/bin/nvim -c "silent! PlugInstall" +qall
+# Installing language servers and formatters NEOVIM 
+RUN /opt/${NVIM}/bin/nvim --headless +"MasonUpdate" +q
+RUN /opt/${NVIM}/bin/nvim --headless +"MasonInstall marksman stylua lua-language-server prettier@2.8.8" +q
+RUN /opt/${NVIM}/bin/nvim --headless +"MasonInstall ltex-ls texlab" +q 
+
+# File format options for Haskell code 
+RUN /opt/${NVIM}/bin/nvim --headless +"MasonInstall fourmolu" +q 
+COPY ./otherfiles/fourmolu.yaml  ${WORKINGDIR}
+RUN mv ${WORKINGDIR}/fourmolu.yaml ${WORKINGDIR}/.local/share/nvim/mason/bin/
+
+############################################## 
+# Tmux 
+############################################## 
+
+RUN apt-get update && apt-get install -y tmux 
+RUN git clone https://github.com/tmux-plugins/tpm ${WORKINGDIR}/.tmux/plugins/tpm
+COPY ./otherfiles/.tmux.conf ${WORKINGDIR}
+
+# Copy the entrypoint script and make it the container's entrypoint
+COPY ./otherfiles/entrypoint.sh /bin/entrypoint
+RUN chmod +x /bin/entrypoint
+
+RUN tmux start-server && \
+    tmux new-session -d && \
+    sleep 1 && \
+    ~/.tmux/plugins/tpm/scripts/install_plugins.sh && \
+    tmux kill-server
+
+# Needed for tmux plugins 
+RUN apt-get update && apt-get install -y inetutils-ping
+
+# Autocomplete 
+RUN echo "deb [trusted=yes] https://apt.fury.io/rsteube/ /" | sudo tee /etc/apt/sources.list.d/rsteube.list 
+RUN apt-get update && apt-get install carapace-bin 
+RUN echo "export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'" >> ${WORKINGDIR}/.bashrc
+RUN echo "source <(carapace _carapace)" >> ${WORKINGDIR}/.bashrc
+
+# Modern PS (btm) 
+RUN curl -LO https://github.com/ClementTsang/bottom/releases/download/0.10.2/bottom_0.10.2-1_amd64.deb
+RUN dpkg -i bottom_0.10.2-1_amd64.deb
+RUN rm bottom_0.10.2-1_amd64.deb
+
+# Modern df (duf) 
+RUN apt-get update && apt-get install duf 
+
+# Modern du (dust)
+RUN curl -LO https://github.com/bootandy/dust/releases/download/v1.2.0/du-dust_1.2.0-1_amd64.deb
+RUN dpkg -i du-dust_1.2.0-1_amd64.deb
+RUN rm du-dust_1.2.0-1_amd64.deb
+
+# Eza (modern ls)
+RUN apt update && apt install -y gpg
+RUN mkdir -p /etc/apt/keyrings
+RUN wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+RUN echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
+RUN chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+RUN apt update && apt install -y eza
+RUN echo "alias ls='eza --icons --git -a'" >> ${WORKINGDIR}/.bashrc
+RUN echo "alias ll='eza -l --icons --git -a'" >> ${WORKINGDIR}/.bashrc
+
+# VIM motions in bash 
+RUN echo "set -o vi" >> ${WORKINGDIR}/.bashrc
+
+# FZF keyshort 
+RUN echo 'eval "$(fzf --bash)"' >> ${WORKINGDIR}/.bashrc
+
+# UTF 
+RUN sed -i 's|# \(en_US.UTF-8 UTF-8\)|\1|' /etc/locale.gen \
+    && locale-gen en_US.UTF-8 \
+    && update-locale LANG=en_US.UTF-8
+
+ENTRYPOINT [ "/bin/entrypoint" ]
