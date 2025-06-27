@@ -234,7 +234,7 @@ return {
             return require("codecompanion.adapters").extend("openai", {
               env = {
                 model = "gpt-4.1-mini",
-                api_key = "<OPENAI KEY>",
+                api_key = os.getenv('OPENAI_API_KEY'),
               },
             })
           end,
@@ -244,6 +244,9 @@ return {
             adapter = "openai",
           },
           inline = {
+            adapter = "openai",
+          },
+          agent = {
             adapter = "openai",
           },
         },
