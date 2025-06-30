@@ -9,16 +9,6 @@ return {
     event = "BufWritePre", -- uncomment for format on save
     opts = require "configs.conform",
   },
-  {
-    "OXY2DEV/markview.nvim",
-    lazy = false,
-    opts = {
-      preview = {
-        filetypes = { "markdown", "codecompanion" },
-        ignore_buftypes = {},
-      },
-    },
-  },
   -- Tree sitter
   {
     "nvim-treesitter/nvim-treesitter",
@@ -238,16 +228,24 @@ return {
               },
             })
           end,
+	  anthropic = function() 
+            return require("codecompanion.adapters").extend("anthropic", {
+              env = {
+                model = "claude-sonnet-4-20250514",
+                api_key = os.getenv('ANTHROPIC_API_KEY'),
+              },
+            })
+          end,
         },
         strategies = {
           chat = {
-            adapter = "openai",
+            adapter = "anthropic",
           },
           inline = {
-            adapter = "openai",
+            adapter = "anthropic",
           },
           agent = {
-            adapter = "openai",
+            adapter = "anthropic",
           },
         },
       }
