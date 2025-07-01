@@ -335,7 +335,7 @@ RUN echo "set -o vi" >> ${WORKINGDIR}/.bashrc
 RUN echo 'eval "$(fzf --bash)"' >> ${WORKINGDIR}/.bashrc
 
 # CodeCompanion in NVIM 
-RUN echo 'export PXDG_RUNTIME_DIR=/tmp' >> ${WORKINGDIR}/.bashrc
+RUN echo 'export XDG_RUNTIME_DIR=/tmp' >> ${WORKINGDIR}/.bashrc
 
 
 
