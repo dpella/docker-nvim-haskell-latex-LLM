@@ -10,83 +10,126 @@ ENV TZ=Europe/Stockholm
 ENV WORKINGDIR=/root
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+WORKDIR ${WORKINGDIR}
+
 # Install all systems packages in one layer 
 RUN apt-get update \ 
-    && \
+  && \
     apt-get install -y --no-install-recommends \
-	# Base utilities 
-         software-properties-common sudo ssh git wget curl make lzma \ 
-	# Development tools 
-         libnuma-dev zlib1g-dev libgmp-dev libgmp10 liblzma-dev gcc \
-	 autoconf automake gpg dirmngr build-essential lsb-release gnupg2 socat \ 
-	# Shell  
-	 powerline less \
-	# Neovim utilities 
-	trash-cli tldr bat coreutils unzip locales npm ripgrep dbus-x11 openjdk-11-jdk \
-	fd-find luarocks \
-	# Tmux 
-	tmux inetutils-ping \
-	# Python tools
-	pip python3.10-venv \
-	# PDF and graphics 
-	pdftk evince inkscape \
-	# Clipboard docker to WSL 
-	xclip \
-	# Modern df (duf) 
-	duf \
-    && \
-     (echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections) \
-    && \ 
+	  # Base utilities 
+    software-properties-common sudo ssh git wget curl make lzma \ 
+	  # Development tools 
+    libnuma-dev zlib1g-dev libgmp-dev libgmp10 liblzma-dev gcc \
+	  autoconf automake gpg dirmngr build-essential lsb-release gnupg2 socat \ 
+	  # Shell  
+	  powerline less \
+	  # Neovim utilities 
+	  trash-cli tldr bat coreutils unzip locales npm ripgrep dbus-x11 openjdk-11-jdk \
+	  fd-find luarocks \
+	  # Tmux 
+	  tmux inetutils-ping \
+	  # Python tools
+	  pip python3.10-venv \
+	  # PDF and graphics 
+	  pdftk evince inkscape \
+	  # Clipboard docker to WSL 
+	  xclip \
+	  # Modern df (duf) 
+	  duf \
+  && \
+    (echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections) \
+  && \ 
     apt-get install -y --no-install-recommends \
-	# LaTeX packages 
-	texlive-xetex zathura latexmk texlive-luatex ttf-mscorefonts-installer texlive-science \
-	texlive-extra-utils texlive-bibtex-extra python3-pygments biber texlive-fonts-extra lhs2tex \
-    && \
-	# Setting up SSH
-	mkdir ~/.ssh && touch ~/.ssh/known_hosts && ssh-keyscan github.com >> ~/.ssh/known_hosts \
-    && \
-	apt-get clean \
-    && \
-	rm -rf /var/lib/apt/lists/* 
+	  # LaTeX packages 
+#	  texlive-xetex zathura latexmk texlive-luatex ttf-mscorefonts-installer texlive-science \
+#	  texlive-extra-utils texlive-bibtex-extra python3-pygments biber texlive-fonts-extra lhs2tex \
+  && \
+	  # Setting up SSH
+	  mkdir ~/.ssh && touch ~/.ssh/known_hosts && ssh-keyscan github.com >> ~/.ssh/known_hosts \
+  && \
+    # Cleaning 
+	  apt-get clean && rm -rf /var/lib/apt/lists/* 
 
 
-############################################## 
-# Haskell
-############################################## 
+# Local configurations 
+RUN locale-gen en_US.UTF-8 && update-locale
+ENV LANG=en_US.UTF-8
+
+# Variables for external tools 
+# Haskell 
 ENV BOOTSTRAP_HASKELL_NONINTERACTIVE=1
-
-RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
-
-# Add ghcup to the PATH
 ENV PATH="${WORKINGDIR}/.ghcup/bin:$PATH"
-
-RUN ghcup install ghc 9.6.7
-RUN ghcup set ghc 9.6.7
-
-# Install cabal
-RUN ghcup install cabal 3.10.1.0
-RUN ghcup set cabal 3.10.1.0
-
-# Install HLS
-RUN ghcup install hls 2.10.0.0
-RUN ghcup set hls 2.10.0.0 
-
 ENV PATH=$PATH:${WORKINGDIR}/.cabal/bin
+# NVM (required by NeoVim) 
+ENV NVM_DIR=/root/.nvm
+ENV NODE_VERSION=18
+# Make node, npm, and tree-sitter available globally
+ENV PATH="$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH"
+# NeoVim 
+ENV NVIM="nvim-linux-x86_64"
 
-# Fast-tag for Haskell files 
-RUN cabal install fast-tags 
+#######################
+# External tools 
+#######################
+RUN \ 
+	  # Haskell 
+#	  (curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh) \ 
+#  && \
+#    ghcup install ghc 9.6.7 && ghcup set ghc 9.6.7 \
+#  && \ 
+    # Cabal 
+#    ghcup install cabal 3.10.1.0 && ghcup set cabal 3.10.1.0 \
+#  && \
+    # Haskell HLS
+#    ghcup install hls 2.10.0.0 && ghcup set hls 2.10.0.0 \
+#  && \
+    # Haskell fast tags 
+#    cabal install fast-tags \
+#  && \
+    # Fuzzy finder 
+     git clone --depth 1 https://github.com/junegunn/fzf.git ${WORKINGDIR}/.fzf && \ 
+     cd ${WORKINGDIR}/.fzf && ./install --all && cd ${WORKINGDIR} \
+  && \
+    # Lazygit 
+    (curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*' > version) && \ 
+    echo '/usr/bin/ssh-add /root/.ssh/key' >> ${WORKINGDIR}/.bashrc \
+  && \ 
+      # Tmux plugins
+    git clone https://github.com/tmux-plugins/tpm ${WORKINGDIR}/.tmux/plugins/tpm
+
+
+# Install NVM and Node.js (required for NeoVim)
+#RUN (curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash) && \
+#    bash -c "source $NVM_DIR/nvm.sh && \
+#             nvm install $NODE_VERSION && \
+#             nvm alias default $NODE_VERSION && \
+#             nvm use $NODE_VERSION && \
+#             npm install -g tree-sitter-cli"
+
+# Install luarocks 
+# RUN luarocks install jsregexp 
+
+# Install NeoVim 
+RUN \ 
+   # NeoVim 
+    curl -LO https://github.com/neovim/neovim/releases/download/v0.11.0/${NVIM}.tar.gz && rm -rf /opt/nvim && \
+    tar -C /opt -xzf ${WORKINGDIR}/${NVIM}.tar.gz && rm ${WORKINGDIR}/${NVIM}.tar.gz && \
+    echo 'export PATH="$PATH:/opt/${NVIM}/bin"' >> ${WORKINGDIR}/.bashrc \
+  && \
+    # NvChad 
+    git clone https://github.com/NvChad/starter ${WORKINGDIR}/.config/nvim
 
 # Hoogle 
 # The way to do it should be like this: RUN cabal install hoogle 
 # Hoogle has currently a bug so we need to install it from the repo
 
-RUN git clone https://github.com/ndmitchell/hoogle.git 
-RUN cd hoogle && cabal install 
-RUN hoogle generate 
-RUN rm -fr hoogle 
+#RUN git clone https://github.com/ndmitchell/hoogle.git 
+#RUN cd hoogle && cabal install 
+#RUN hoogle generate 
+#RUN rm -fr hoogle 
 
 ############################################### 
-# Powerline + Fuzzy Finder 
+# Powerline + Fuzzy Finder configuration
 ############################################## 
 
 # Copy activation lines for powerfile 
@@ -106,81 +149,33 @@ RUN echo "alias less='batcat -p'" >> ${WORKINGDIR}/.bashrc
 RUN echo 'eval $(ssh-agent)' >> ${WORKINGDIR}/.bashrc
 
 # Fuzzy find filer
-RUN git clone --depth 1 https://github.com/junegunn/fzf.git ${WORKINGDIR}/.fzf
-
-WORKDIR ${WORKINGDIR}/.fzf
-
-RUN ./install --all  
 
 COPY ./otherfiles/fzf ${WORKINGDIR}
 RUN cat ${WORKINGDIR}/fzf >> ${WORKINGDIR}/.bashrc && rm ${WORKINGDIR}/fzf 
 
-WORKDIR ${WORKINGDIR}
+# WORKDIR ${WORKINGDIR}
 
 ############################################## 
-# GIT + Lazygit 
+# GIT + Lazygit configutarion 
 ############################################## 
 
-RUN echo '/usr/bin/ssh-add /root/.ssh/key' >> ${WORKINGDIR}/.bashrc
 COPY ./ssh/gituser ${WORKINGDIR} 
 RUN cat ${WORKINGDIR}/gituser >> ${WORKINGDIR}/.bashrc 
 RUN rm -f ${WORKINGDIR}/gituser 
 
 ## Lazygit (visual aid for git)
-RUN curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*' > version
-RUN echo -n 'curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_' > cmd
-RUN echo -n $(cat version) >> cmd
-RUN echo -n '_Linux_x86_64.tar.gz"' >> cmd
-RUN cat cmd | /bin/sh
-RUN tar xf lazygit.tar.gz lazygit
-RUN install lazygit /usr/local/bin
-RUN rm -f cmd lazygit lazygit.tar.gz version
-
-##
-# Clipboard from docker into WSL 
-##
+RUN \ 
+  echo -n 'curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_' > cmd && \
+  echo -n $(cat version) >> cmd && \
+  echo -n '_Linux_x86_64.tar.gz"' >> cmd && \
+  (cat cmd | /bin/sh) && \
+  tar xf lazygit.tar.gz lazygit && \ 
+  install lazygit /usr/local/bin && \
+  rm -f cmd lazygit lazygit.tar.gz version
 
 ############################################## 
-# Utilities required by Neo Vim 
-############################################## 
-
-# Set up environment variables for NVM
-ENV NVM_DIR=/root/.nvm
-ENV NODE_VERSION=18
-
-# Install NVM and Node.js
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && \
-    . "$NVM_DIR/nvm.sh" && \
-    nvm install $NODE_VERSION && \
-    nvm alias default $NODE_VERSION && \
-    nvm use $NODE_VERSION && \
-    npm install -g tree-sitter-cli
-
-# Make node, npm, and tree-sitter available globally
-ENV PATH="$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH"
-
-RUN luarocks install jsregexp
-
-############################################## 
-# Neo Vim + NvChad
-############################################## 
-
-ENV NVIM="nvim-linux-x86_64"
-RUN curl -LO https://github.com/neovim/neovim/releases/download/v0.11.0/${NVIM}.tar.gz
-RUN rm -rf /opt/nvim
-RUN tar -C /opt -xzf ${NVIM}.tar.gz 
-RUN rm ${WORKINGDIR}/${NVIM}.tar.gz
-RUN echo 'export PATH="$PATH:/opt/${NVIM}/bin"' >> ${WORKINGDIR}/.bashrc
-
-# NVChad (IDE based on NeoVIM) 
-RUN git clone https://github.com/NvChad/starter ${WORKINGDIR}/.config/nvim
-
-# Locale 
-RUN locale-gen en_US.UTF-8
-RUN update-locale
-ENV LANG=en_US.UTF-8
-
 # Configuration for NvChad 
+############################################## 
 
 # Top-level init
 COPY ./otherfiles/top-init.lua   ${WORKINGDIR}/.config/nvim/init-add.lua
@@ -209,23 +204,26 @@ COPY ./otherfiles/chadrc.lua     ${WORKINGDIR}/.config/nvim/lua/
 RUN mkdir ${WORKINGDIR}/.config/nvim/lua/custom/
 COPY ./otherfiles/autocmds.lua ${WORKINGDIR}/.config/nvim/lua/custom/
 
-# Installing plugins NEOVIM  
-RUN /opt/${NVIM}/bin/nvim -c "silent! PlugInstall" +qall
-# Installing language servers and formatters NEOVIM 
-RUN /opt/${NVIM}/bin/nvim --headless +"MasonUpdate" +q
-RUN /opt/${NVIM}/bin/nvim --headless +"MasonInstall marksman stylua lua-language-server prettier@2.8.8" +q
-RUN /opt/${NVIM}/bin/nvim --headless +"MasonInstall ltex-ls texlab" +q 
+# External Nvim tools
+RUN \
+    # Installing plugins NEOVIM  
+    /opt/${NVIM}/bin/nvim -c "silent! PlugInstall" +qall \
+  && \ 
+    # Installing language servers and formatters NEOVIM 
+    /opt/${NVIM}/bin/nvim --headless +"MasonUpdate" +q && \
+    /opt/${NVIM}/bin/nvim --headless +"MasonInstall marksman stylua lua-language-server prettier@2.8.8" +q && \
+    /opt/${NVIM}/bin/nvim --headless +"MasonInstall ltex-ls texlab" +q && \
+    # Haskell code formatter 
+    /opt/${NVIM}/bin/nvim --headless +"MasonInstall fourmolu" +q 
 
 # File format options for Haskell code 
-RUN /opt/${NVIM}/bin/nvim --headless +"MasonInstall fourmolu" +q 
 COPY ./otherfiles/fourmolu.yaml  ${WORKINGDIR}
 RUN mv ${WORKINGDIR}/fourmolu.yaml ${WORKINGDIR}/.local/share/nvim/mason/bin/
 
 ############################################## 
-# Tmux 
+# Tmux configuration
 ############################################## 
 
-RUN git clone https://github.com/tmux-plugins/tpm ${WORKINGDIR}/.tmux/plugins/tpm
 COPY ./otherfiles/.tmux.conf ${WORKINGDIR}
 
 # Copy the entrypoint script and make it the container's entrypoint
@@ -243,40 +241,42 @@ RUN tmux start-server && \
 # MkDocs
 ############################################## 
 
-RUN pip install --upgrade Pygments
-RUN pip install pymdown-extensions
-RUN pip install mkdocs
+RUN \
+  pip install --upgrade Pygments && \
+  pip install pymdown-extensions && \
+  pip install mkdocs
 
 # Tools for Python development 
-
 RUN pip install scipy 
 
-
 # Autocomplete 
-RUN echo "deb [trusted=yes] https://apt.fury.io/rsteube/ /" | sudo tee /etc/apt/sources.list.d/rsteube.list 
-RUN apt-get update && apt-get install carapace-bin 
-RUN echo "export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'" >> ${WORKINGDIR}/.bashrc
-RUN echo "source <(carapace _carapace)" >> ${WORKINGDIR}/.bashrc
+RUN \
+	echo "deb [trusted=yes] https://apt.fury.io/rsteube/ /" | sudo tee /etc/apt/sources.list.d/rsteube.list && \
+	apt-get update && apt-get install carapace-bin && \
+	echo "export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'" >> ${WORKINGDIR}/.bashrc && \
+	echo "source <(carapace _carapace)" >> ${WORKINGDIR}/.bashrc
 
 # Modern PS (btm) 
-RUN curl -LO https://github.com/ClementTsang/bottom/releases/download/0.10.2/bottom_0.10.2-1_amd64.deb
-RUN dpkg -i bottom_0.10.2-1_amd64.deb
-RUN rm bottom_0.10.2-1_amd64.deb
+RUN \
+	curl -LO https://github.com/ClementTsang/bottom/releases/download/0.10.2/bottom_0.10.2-1_amd64.deb && \ 
+	dpkg -i bottom_0.10.2-1_amd64.deb && \ 
+	rm bottom_0.10.2-1_amd64.deb
 
 # Modern du (dust)
-RUN curl -LO https://github.com/bootandy/dust/releases/download/v1.2.0/du-dust_1.2.0-1_amd64.deb
-RUN dpkg -i du-dust_1.2.0-1_amd64.deb
-RUN rm du-dust_1.2.0-1_amd64.deb
+RUN \
+	curl -LO https://github.com/bootandy/dust/releases/download/v1.2.0/du-dust_1.2.0-1_amd64.deb && \
+	dpkg -i du-dust_1.2.0-1_amd64.deb && \ 
+	rm du-dust_1.2.0-1_amd64.deb
 
 # Eza (modern ls)
-RUN apt update && apt install -y gpg
-RUN mkdir -p /etc/apt/keyrings
-RUN wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
-RUN echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
-RUN chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
-RUN apt update && apt install -y eza
-RUN echo "alias ls='eza --icons --git -a'" >> ${WORKINGDIR}/.bashrc
-RUN echo "alias ll='eza -l --icons --git -a'" >> ${WORKINGDIR}/.bashrc
+RUN \
+	mkdir -p /etc/apt/keyrings && \
+	(wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | gpg --dearmor -o /etc/apt/keyrings/gierens.gpg) && \ 
+	echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list && \ 
+	chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list && \ 
+	apt update && apt install -y eza && \ 
+	echo "alias ls='eza --icons --git -a'" >> ${WORKINGDIR}/.bashrc && \ 
+	echo "alias ll='eza -l --icons --git -a'" >> ${WORKINGDIR}/.bashrc
 
 # VIM motions in bash 
 RUN echo "set -o vi" >> ${WORKINGDIR}/.bashrc
@@ -286,7 +286,5 @@ RUN echo 'eval "$(fzf --bash)"' >> ${WORKINGDIR}/.bashrc
 
 # CodeCompanion in NVIM 
 RUN echo 'export XDG_RUNTIME_DIR=/tmp' >> ${WORKINGDIR}/.bashrc
-
-
 
 ENTRYPOINT [ "/bin/entrypoint" ]
