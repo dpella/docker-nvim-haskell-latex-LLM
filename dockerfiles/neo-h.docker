@@ -10,68 +10,45 @@ ENV TZ=Europe/Stockholm
 ENV WORKINGDIR=/root
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Install base system utilities and dependencies
+# Install all systems packages in one layer 
 RUN apt-get update \ 
     && \
     apt-get install -y --no-install-recommends \
-         software-properties-common \ 
-         sudo \ 
-         ssh  \
-         git  \
-         wget \ 
-         curl \ 
-         make \ 
-         lzma \ 
-         libnuma-dev \
-         zlib1g-dev \
-	 libgmp-dev \
-	 libgmp10 \
-         liblzma-dev \ 
-	 gcc \
-	 autoconf \
-	 automake \
-	 gpg \
-         dirmngr \
-	 build-essential \
-       	 lsb-release \
-         gnupg2 \ 
-	 socat  
-
-RUN apt-get update \
+	# Base utilities 
+         software-properties-common sudo ssh git wget curl make lzma \ 
+	# Development tools 
+         libnuma-dev zlib1g-dev libgmp-dev libgmp10 liblzma-dev gcc \
+	 autoconf automake gpg dirmngr build-essential lsb-release gnupg2 socat \ 
+	# Shell  
+	 powerline less \
+	# Neovim utilities 
+	trash-cli tldr bat coreutils unzip locales npm ripgrep dbus-x11 openjdk-11-jdk \
+	fd-find luarocks \
+	# Tmux 
+	tmux inetutils-ping \
+	# Python tools
+	pip python3.10-venv \
+	# PDF and graphics 
+	pdftk evince inkscape \
+	# Clipboard docker to WSL 
+	xclip \
+	# Modern df (duf) 
+	duf \
     && \
-    apt-get install -y \
-        powerline \ 
-        less \
+     (echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections) \
     && \ 
-    mkdir ~/.ssh \ 
+    apt-get install -y --no-install-recommends \
+	# LaTeX packages 
+	texlive-xetex zathura latexmk texlive-luatex ttf-mscorefonts-installer texlive-science \
+	texlive-extra-utils texlive-bibtex-extra python3-pygments biber texlive-fonts-extra lhs2tex \
     && \
-    touch ~/.ssh/known_hosts \
-    && \ 
-    ssh-keyscan github.com >> ~/.ssh/known_hosts 
- 
-############################################### 
-# Latex 
-############################################## 
+	# Setting up SSH
+	mkdir ~/.ssh && touch ~/.ssh/known_hosts && ssh-keyscan github.com >> ~/.ssh/known_hosts \
+    && \
+	apt-get clean \
+    && \
+	rm -rf /var/lib/apt/lists/* 
 
-# Accepting the license 
-RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
-
-RUN apt-get update # For some reason, it needs this for Latex
-
-RUN apt-get update \
-	&& \
-    apt-get install -y \
-	texlive-xetex \
-	zathura \
-	latexmk \
-	texlive-luatex \
-	ttf-mscorefonts-installer \
-	texlive-science \
-	texlive-extra-utils \
-	texlive-bibtex-extra \
-	python3-pygments \
-	biber \
-	texlive-fonts-extra
 
 ############################################## 
 # Haskell
@@ -162,27 +139,10 @@ RUN rm -f cmd lazygit lazygit.tar.gz version
 ##
 # Clipboard from docker into WSL 
 ##
-RUN apt-get update && apt-get install -y xclip 
 
 ############################################## 
 # Utilities required by Neo Vim 
 ############################################## 
-
-RUN apt-get update \
-    && \
-    apt-get install -y \
-	trash-cli \
-    tldr \
-    bat \
-	coreutils \
-	unzip \
-	locales \
-	npm \
-	ripgrep \
-	dbus-x11 \
-	openjdk-11-jdk \
-	fd-find \ 
-	luarocks 
 
 # Set up environment variables for NVM
 ENV NVM_DIR=/root/.nvm
@@ -265,7 +225,6 @@ RUN mv ${WORKINGDIR}/fourmolu.yaml ${WORKINGDIR}/.local/share/nvim/mason/bin/
 # Tmux 
 ############################################## 
 
-RUN apt-get update && apt-get install -y tmux 
 RUN git clone https://github.com/tmux-plugins/tpm ${WORKINGDIR}/.tmux/plugins/tpm
 COPY ./otherfiles/.tmux.conf ${WORKINGDIR}
 
@@ -279,25 +238,19 @@ RUN tmux start-server && \
     ~/.tmux/plugins/tpm/scripts/install_plugins.sh && \
     tmux kill-server
 
-# Needed for tmux plugins 
-RUN apt-get update && apt-get install -y inetutils-ping
 
 ############################################## 
 # MkDocs
 ############################################## 
 
-RUN apt-get update && apt-get install -y pip 
 RUN pip install --upgrade Pygments
 RUN pip install pymdown-extensions
 RUN pip install mkdocs
 
 # Tools for Python development 
 
-RUN apt-get update && apt-get install python3.10-venv -y
 RUN pip install scipy 
 
-# Miscelaneous (PDF tools and graphic tools)
-RUN apt-get update && apt-get install -y pdftk evince inkscape lhs2tex
 
 # Autocomplete 
 RUN echo "deb [trusted=yes] https://apt.fury.io/rsteube/ /" | sudo tee /etc/apt/sources.list.d/rsteube.list 
@@ -309,9 +262,6 @@ RUN echo "source <(carapace _carapace)" >> ${WORKINGDIR}/.bashrc
 RUN curl -LO https://github.com/ClementTsang/bottom/releases/download/0.10.2/bottom_0.10.2-1_amd64.deb
 RUN dpkg -i bottom_0.10.2-1_amd64.deb
 RUN rm bottom_0.10.2-1_amd64.deb
-
-# Modern df (duf) 
-RUN apt-get update && apt-get install duf 
 
 # Modern du (dust)
 RUN curl -LO https://github.com/bootandy/dust/releases/download/v1.2.0/du-dust_1.2.0-1_amd64.deb
