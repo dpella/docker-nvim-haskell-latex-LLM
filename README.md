@@ -54,6 +54,11 @@ You have all of NvChad with the addition of severals plugins and configurations 
 - If something is not working, write `:checkhealth` for the whole nvim, or `:checkhealth <pluginname>`
 - Latex
 	- `<leader> bb` searching in bibliography
+- Tmux 
+	- `<C-q>` Main horizontal 
+  - `<C-w>` Main vertical 
+  - `<C-a>` Even horizontal 
+  - `<C-s>` Even vertical
 
 All of the docker images will have a volume associated with it and mounted in `/vol`.
 This is the directory where you should put all your persisten data.
