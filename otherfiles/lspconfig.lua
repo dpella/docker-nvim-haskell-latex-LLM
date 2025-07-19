@@ -1,7 +1,5 @@
--- EXAMPLE
-local on_attach = require("nvchad.configs.lspconfig").on_attach
-local on_init = require("nvchad.configs.lspconfig").on_init
-local capabilities = require("nvchad.configs.lspconfig").capabilities
+-- load defaults i.e lua_lsp
+require("nvchad.configs.lspconfig").defaults()
 
 local lspconfig = require "lspconfig"
 
@@ -18,8 +16,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
     --     opts.desc = "Show LSP references"
     --     keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts) -- show definition, references
     --
-    --     opts.desc = "Go to declaration"
-    --     keymap.set("n", "gD", vim.lsp.buf.declaration, opts) -- go to declaration
+    opts.desc = "Go to definition"
+    keymap.set("n", "gd", vim.lsp.buf.definition, opts) -- go to definition (same buffer)
     --
     opts.desc = "List LSP workspace symbols"
     keymap.set("n", "<leader>ls", "<cmd>Telescope lsp_workspace_symbols<CR>", opts) -- show lsp definitions
@@ -94,16 +92,22 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
--- local servers = { "hls", "lua_ls", "marksman", "texlab" }
-local servers = { "lua_ls", "marksman", "texlab", "pylsp" }
+local servers = { "lua_ls", "marksman", "texlab", "html", "cssls" }
+local nvlsp = require "nvchad.configs.lspconfig"
+
 -- lsps with default config
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
-    on_attach = on_attach,
-    on_init = on_init,
-    capabilities = capabilities,
+    on_attach = nvlsp.on_attach,
+    on_init = nvlsp.on_init,
+    capabilities = nvlsp.capabilities,
   }
 end
+
+-- For ltex extension to add to dictionaries
+local on_attach = require("nvchad.configs.lspconfig").on_attach
+local on_init = require("nvchad.configs.lspconfig").on_init
+local capabilities = require("nvchad.configs.lspconfig").capabilities
 
 lspconfig["ltex"].setup {
   on_attach = function(client, bufnr)
@@ -112,11 +116,17 @@ lspconfig["ltex"].setup {
   end,
   on_init = on_init,
   capabilities = capabilities,
+  settings = {
+    ltex = {
+      checkFrequency = "save",
+      language = "en-US",
+    },
+  },
 }
 
--- typescript
-lspconfig.ts_ls.setup {
-  on_attach = on_attach,
-  on_init = on_init,
-  capabilities = capabilities,
-}
+-- configuring single server, example: typescript
+-- lspconfig.ts_ls.setup {
+--   on_attach = nvlsp.on_attach,
+--   on_init = nvlsp.on_init,
+--   capabilities = nvlsp.capabilities,
+-- }

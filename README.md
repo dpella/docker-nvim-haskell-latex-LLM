@@ -4,7 +4,7 @@ This repository builds a docker image of NvChad -- a customization of Neo Vim.
 
 You have all of NvChad with the addition of severals plugins and configurations to:
 
-1. Develop in Haskell (language server) 
+- Develop in Haskell (language server) 
 	- `<leader>ld` shows all the errors/suggestions 
 	- `<leader>lt` shows all tags 
 	- `<leader>ls` shows all symbols
@@ -19,30 +19,41 @@ You have all of NvChad with the addition of severals plugins and configurations 
 	- `]d` next suggestion/error
 	- `[d` previous suggestion/error 
 	- `<leader>ts` provides type-signatures that fit a type-hole using Hoogle
-2. Write markdown documents (language server) 
-3. Write, compile, and visualize Latex documents (`<leader> cl`)
-4. Manage repositories and commits (Lazygit, `<leader>gg`)
-5. Auto-indentation when saving files (`*.hs`, `*.tex`, `*.lua`)
-6. Dictionary and writting suggestion by ltex 
-7. Multi-cursor editing capabilities (`<C-m>`, then `n` to move to next one, `q` to skip that occurence)
-8. Smart rename (position in a word and hit `<leader>sr`)
-9. Keeping tracks of comments of the form `TODO:`, `HACK:`, and `BUG:` (`]t` and `[t` for next an prev comment)
-10. Save and restore sessions (`<leader> z`)
-11. LLM Support (Ollama) with Mistral model (`<leader>ww`)
-12. Welcome screen of DPella (the company where I work)
-13. Toggle autoformat (`<leader>tt`)
-14. Adding symbols around a word `v iw S{` will take `foo` into `{ foo }`
-15. `viw` select the current word 
-15. `vi{` select the text around `{`
-16. `vac{` select the text around `{`, but including the brackets. It can be changed to `vac[` and so on
-17. `O` in visual mode changes to the other extreme
-18. `gq%` does autowrapped until finding character `%`
-19. `%` goes from an open marker (e.g., `{`) to the closing one
-20. `W` jumps to the next word with space. Useful when having `list.get(10)`
-21. `Ctrl+w` for all windows related things (resize, swap, etc.)
-22. `:tabe .` to select a file an open it in a different tab
-23. `za` folds/opens code
-24. If something is not working, write `:checkhealth` for the whole nvim, or `:checkhealth <pluginname>`
+- Write markdown documents (language server) 
+- Write, compile, and visualize Latex documents (`<leader> cl`)
+- Manage repositories and commits (Lazygit, `<leader>gg`)
+- Auto-indentation when saving files (`*.hs`, `*.tex`, `*.lua`)
+- Dictionary and writting suggestion by ltex 
+- Smart rename (position in a word and hit `<leader>sr`)
+- Global rename (position in a word and hit `<leader>s`)
+- Keeping tracks of comments of the form `TODO:`, `HACK:`, and `BUG:` (`]t` and `[t` for next an prev comment)
+- Save and restore sessions (`<leader> z`)
+- LLM Support (OpenAI) 
+	- with CodeCompanion (`<leader>at` toggle prompt, `<leader>aa` to ask (visual mode)) 
+  - `<leader> ga` while in the code companion will change the "adapter" (i.e., chatGPT, Claude, etc.)
+  - `ga` accept proposals 
+  - `gr` reject proposals
+- Welcome screen of DPella (the company where I work)
+- Editing tips
+	- `<C-\><C-n>` to get out of the terminal mode back into nvim 
+	- `viw` select the current word 
+	- `vi{` select the text around `{`
+	- `vac{` select the text around `{`, but including the brackets. It can be changed to `vac[` and so on
+	- `O` in visual mode changes to the other extreme
+	- `gq%` does autowrapped until finding character `%`
+	- `%` goes from an open marker (e.g., `{`) to the closing one
+	- `W` jumps to the next word with space. Useful when having `list.get(10)`
+        - `M` puts the cursor at the middle of the screen
+        - `zz` puts the current line in the middle 
+        - `f<character>` finds the next `<character>` in the current line, `F<character>` does it backwards. 
+          `;` repeats the find and `,` in opposite direction
+
+- `Ctrl+w` for all windows related things (resize, swap, etc.)
+- `:tabe .` to select a file an open it in a different tab
+- `za` folds/opens code
+- If something is not working, write `:checkhealth` for the whole nvim, or `:checkhealth <pluginname>`
+- Latex
+	- `<leader> bb` searching in bibliography
 
 All of the docker images will have a volume associated with it and mounted in `/vol`.
 This is the directory where you should put all your persisten data.
@@ -51,7 +62,7 @@ This is the directory where you should put all your persisten data.
 
 ## SSH Keys:
 
-Once you clone this repo, you should get into `ssh` and add your private /
+Once you clone this repo, you should get into the folder `ssh` and add your private /
 public keys to connect to Github or Bitbucket.
 
 File `key` is the private key file which is **not** passphrase protected. File
@@ -74,34 +85,13 @@ In file `./ssh/gituser`, complete the following lines with your name and email a
 git config --global user.name "Your name here" 
 git config --global user.email you@email.address
 ```
-## LLM (Mistral)
+## Keys for AI services 
 
-You can run LLM inside nvim! The image will be preconfigured with [Mistral AI model](https://mistral.ai/) 
-run via [Ollama](https://ollama.com/). You can run the LLM locally or connect to a remote server via SSH. 
+After clonning the repo, you should go into the folder `ssh` and add your API keys for 
+different AI services. 
 
-Go to the file `./ssh/llm` 
-
-```bash
-LLM_MODE=0  # 0 for local, and 1 for connecting with a remote server via SSH tunneling
-
-# For remote only  
-LLM_SERVER=<your Ollama server>
-LLM_PORT=<port where Ollama is listening, default 2022>
-SSH_USER=<your username to login into the remote machine>
-SSH_PORT=<the port where SSH is listening>
-```
-If you want to change the LLM model or use another port (that is not 2022), you
-should also need to change the file `otherfiles/init.lua`: 
-
-```lua 
-{
-    "David-Kunz/gen.nvim",
-    lazy = false,
-    opts = {
-      model = "mistral:instruct",
-      port = 2022,
-    },
-```
+- For ChatGPT, write the key in the file `openai_key`
+- For Claude, write the key in the file `antropic_key`
 
 # Launch 
 
@@ -119,13 +109,6 @@ docker attach <4 first letters of the container created>
 ```
 
 Once inside the container, type 
-
-```bash 
-./llm.sh
-```
-to start the LLM locally or to connect to the remote server. 
-
-then, 
 
 ```bash 
 nvim 

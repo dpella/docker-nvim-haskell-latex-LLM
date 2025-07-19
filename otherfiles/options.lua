@@ -27,3 +27,13 @@ o.smartindent = true
 o.autoindent = true
 o.copyindent = true
 o.shiftround = true
+
+-- Column limit
+o.colorcolumn = "100"
+
+-- When scrolling up or down, leave at least this amount of lines
+o.scrolloff = 8
+
+-- Line numbers on and being relative 
+o.nu = true
+o.relativenumber = true

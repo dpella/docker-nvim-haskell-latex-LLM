@@ -57,10 +57,6 @@ if [ "${IMAGE}" = "neo-h" ]; then
     PORT_OPTION="-p 0.0.0.0:8000:8000"
 fi
 
-if [ "${IMAGE}" = "llm" ]; then
-    PORT_OPTION="-p 0.0.0.0:8080:8080"
-fi
-
 docker run --rm \
 	   -d   \
 	   --cpus="8" \
@@ -69,6 +65,8 @@ docker run --rm \
 	   -v ${IMAGE}:/vol  \
            -v /tmp/.X11-unix:/tmp/.X11-unix \
            -v /mnt/wslg:/mnt/wslg \
+	   -v /var/run/docker.sock:/var/run/docker.sock \
+	   -v /usr/bin/docker:/usr/bin/docker \
 	   -e "TERM=xterm-256color" \
            -e DISPLAY \
            -e WAYLAND_DISPLAY \
