@@ -90,7 +90,7 @@ git config --global user.email you@email.address
 After clonning the repo, you should go into the folder `ssh` and add your API keys for 
 different AI services. 
 
-- For ChatGPT, write the key in the file `chatgpt-key`
+- For ChatGPT, write the key in the file `openai_key`
 - For Claude, write the key in the file `antropic_key`
 
 # Launch 
