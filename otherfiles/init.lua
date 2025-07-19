@@ -253,7 +253,7 @@ return {
       local keymap = vim.keymap
 
       keymap.set("n", "<leader>at", "<cmd>CodeCompanionChat Toggle<CR>", { desc = "Toggle Code Companion Chat" })
-      keymap.set("n", "<leader>aa", "<cmd>CodeCompanion<CR>", { desc = "Open Code Companion Inline" })
+      keymap.set("v", "<leader>aa", "<cmd>CodeCompanion<CR>", { desc = "Open Code Companion Inline" })
     end,
   },
   {

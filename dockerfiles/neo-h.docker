@@ -1,4 +1,7 @@
-FROM ubuntu:22.04 
+################################
+### Base image #################
+################################
+FROM ubuntu:22.04 AS aptpackages
 
 # Image metadata
 LABEL maintainer="alejandro@dpella.io"
@@ -12,7 +15,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 WORKDIR ${WORKINGDIR}
 
-# Install all systems packages in one layer 
+# Install all systems packages in one 
 RUN apt-get update \ 
   && \
     apt-get install -y --no-install-recommends \
@@ -41,8 +44,8 @@ RUN apt-get update \
   && \ 
     apt-get install -y --no-install-recommends \
 	  # LaTeX packages 
-#	  texlive-xetex zathura latexmk texlive-luatex ttf-mscorefonts-installer texlive-science \
-#	  texlive-extra-utils texlive-bibtex-extra python3-pygments biber texlive-fonts-extra lhs2tex \
+	  #texlive-xetex zathura latexmk texlive-luatex ttf-mscorefonts-installer texlive-science \
+	  #texlive-extra-utils texlive-bibtex-extra python3-pygments biber texlive-fonts-extra lhs2tex \
   && \
 	  # Setting up SSH
 	  mkdir ~/.ssh && touch ~/.ssh/known_hosts && ssh-keyscan github.com >> ~/.ssh/known_hosts \
@@ -50,16 +53,113 @@ RUN apt-get update \
     # Cleaning 
 	  apt-get clean && rm -rf /var/lib/apt/lists/* 
 
-
 # Local configurations 
 RUN locale-gen en_US.UTF-8 && update-locale
 ENV LANG=en_US.UTF-8
 
-# Variables for external tools 
-# Haskell 
-ENV BOOTSTRAP_HASKELL_NONINTERACTIVE=1
-ENV PATH="${WORKINGDIR}/.ghcup/bin:$PATH"
-ENV PATH=$PATH:${WORKINGDIR}/.cabal/bin
+# VIM motions in bash 
+RUN echo "set -o vi" >> ${WORKINGDIR}/.bashrc
+
+# Loading key for github, etc.
+RUN echo 'eval $(ssh-agent)' >> ${WORKINGDIR}/.bashrc
+RUN echo '/usr/bin/ssh-add /root/.ssh/key' >> ${WORKINGDIR}/.bashrc 
+
+################################
+### Modern CLI tools ###########
+################################
+FROM aptpackages AS utils-cli 
+
+# Modern tools 
+RUN \
+		# Autocomplete 
+		echo "deb [trusted=yes] https://apt.fury.io/rsteube/ /" | sudo tee /etc/apt/sources.list.d/rsteube.list && \
+		apt-get update && apt-get install carapace-bin && \
+		echo "export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'" >> ${WORKINGDIR}/.bashrc && \
+		echo "source <(carapace _carapace)" >> ${WORKINGDIR}/.bashrc \
+	&& \
+		# Modern PS (btm) 
+		curl -LO https://github.com/ClementTsang/bottom/releases/download/0.10.2/bottom_0.10.2-1_amd64.deb && \ 
+		dpkg -i bottom_0.10.2-1_amd64.deb && \ 
+		rm bottom_0.10.2-1_amd64.deb \
+	&& \ 
+		# Modern du (dust)
+		curl -LO https://github.com/bootandy/dust/releases/download/v1.2.0/du-dust_1.2.0-1_amd64.deb && \
+		dpkg -i du-dust_1.2.0-1_amd64.deb && \ 
+		rm du-dust_1.2.0-1_amd64.deb \
+	&& \ 
+		# Eza (modern ls)
+		mkdir -p /etc/apt/keyrings && \
+		(wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | gpg --dearmor -o /etc/apt/keyrings/gierens.gpg) && \ 
+		echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list && \ 
+		chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list && \ 
+		apt update && apt install -y eza && \ 
+		echo "alias ls='eza --icons --git -a'" >> ${WORKINGDIR}/.bashrc && \ 
+		echo "alias ll='eza -l --icons --git -a'" >> ${WORKINGDIR}/.bashrc \
+	&& \
+    # Fuzzy finder 
+    git clone --depth 1 https://github.com/junegunn/fzf.git ${WORKINGDIR}/.fzf && \ 
+    cd ${WORKINGDIR}/.fzf && ./install --all && cd ${WORKINGDIR} \
+  && \
+    # Lazygit (visual aid for git)
+    (curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*' > version) && \ 
+  	echo -n 'curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_' > cmd && \
+  	echo -n $(cat version) >> cmd && \
+  	echo -n '_Linux_x86_64.tar.gz"' >> cmd && \
+  	(cat cmd | /bin/sh) && \
+  	tar xf lazygit.tar.gz lazygit && \ 
+  	install lazygit /usr/local/bin && \
+  	rm -f cmd lazygit lazygit.tar.gz version \
+  && \ 
+    # Tmux plugins
+    git clone https://github.com/tmux-plugins/tpm ${WORKINGDIR}/.tmux/plugins/tpm 
+
+############################################## 
+# Powerline + Fuzzy Finder configuration
+############################################## 
+# Copy activation lines for powerfile 
+COPY ./otherfiles/powerline ${WORKINGDIR}
+# Two lines  
+COPY ./otherfiles/default.twolines.json ${WORKINGDIR}
+# Activate powerline 
+RUN \ 
+	cat ${WORKINGDIR}/powerline >> ${WORKINGDIR}/.bashrc && rm  ${WORKINGDIR}/powerline  
+# Activate two lines powerline 
+RUN mv ${WORKINGDIR}/default.twolines.json /usr/share/powerline/config_files/themes/shell
+RUN sed -i 's/default_leftonly/default.twolines/g' /usr/share/powerline/config_files/config.json
+RUN echo "alias less='batcat -p'" >> ${WORKINGDIR}/.bashrc 
+# Fuzzy find filer
+COPY ./otherfiles/fzf ${WORKINGDIR}
+RUN cat ${WORKINGDIR}/fzf >> ${WORKINGDIR}/.bashrc && rm ${WORKINGDIR}/fzf 
+
+############################################## 
+# Git + Lazygit configutarion 
+############################################## 
+COPY ./ssh/gituser ${WORKINGDIR} 
+RUN cat ${WORKINGDIR}/gituser >> ${WORKINGDIR}/.bashrc 
+RUN rm -f ${WORKINGDIR}/gituser 
+
+############################################## 
+# Tmux configuration
+############################################## 
+COPY ./otherfiles/.tmux.conf ${WORKINGDIR}
+# Copy the entrypoint script and make it the container's entrypoint
+COPY ./otherfiles/entrypoint.sh /bin/entrypoint
+RUN chmod +x /bin/entrypoint
+# Configuration of plugins
+RUN tmux start-server && \
+    tmux new-session -d && \
+    sleep 1 && \
+    ~/.tmux/plugins/tpm/scripts/install_plugins.sh && \
+    tmux kill-server
+
+# FZF keyshort 
+RUN echo 'eval "$(fzf --bash)"' >> ${WORKINGDIR}/.bashrc
+
+################################
+### NeoVim #####################
+################################
+FROM utils-cli AS neovim 
+
 # NVM (required by NeoVim) 
 ENV NVM_DIR=/root/.nvm
 ENV NODE_VERSION=18
@@ -68,142 +168,43 @@ ENV PATH="$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH"
 # NeoVim 
 ENV NVIM="nvim-linux-x86_64"
 
-#######################
-# External tools 
-#######################
-RUN \ 
-	  # Haskell 
-#	  (curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh) \ 
-#  && \
-#    ghcup install ghc 9.6.7 && ghcup set ghc 9.6.7 \
-#  && \ 
-    # Cabal 
-#    ghcup install cabal 3.10.1.0 && ghcup set cabal 3.10.1.0 \
-#  && \
-    # Haskell HLS
-#    ghcup install hls 2.10.0.0 && ghcup set hls 2.10.0.0 \
-#  && \
-    # Haskell fast tags 
-#    cabal install fast-tags \
-#  && \
-    # Fuzzy finder 
-     git clone --depth 1 https://github.com/junegunn/fzf.git ${WORKINGDIR}/.fzf && \ 
-     cd ${WORKINGDIR}/.fzf && ./install --all && cd ${WORKINGDIR} \
-  && \
-    # Lazygit 
-    (curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*' > version) && \ 
-    echo '/usr/bin/ssh-add /root/.ssh/key' >> ${WORKINGDIR}/.bashrc \
-  && \ 
-      # Tmux plugins
-    git clone https://github.com/tmux-plugins/tpm ${WORKINGDIR}/.tmux/plugins/tpm
-
-
 # Install NVM and Node.js (required for NeoVim)
-#RUN (curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash) && \
-#    bash -c "source $NVM_DIR/nvm.sh && \
-#             nvm install $NODE_VERSION && \
-#             nvm alias default $NODE_VERSION && \
-#             nvm use $NODE_VERSION && \
-#             npm install -g tree-sitter-cli"
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash 
+RUN . "$NVM_DIR/nvm.sh" && nvm install $NODE_VERSION && nvm alias default $NODE_VERSION && \
+	nvm use $NODE_VERSION && npm install -g tree-sitter-cli 
 
 # Install luarocks 
-# RUN luarocks install jsregexp 
+RUN luarocks install jsregexp 
 
 # Install NeoVim 
-RUN \ 
-   # NeoVim 
-    curl -LO https://github.com/neovim/neovim/releases/download/v0.11.0/${NVIM}.tar.gz && rm -rf /opt/nvim && \
-    tar -C /opt -xzf ${WORKINGDIR}/${NVIM}.tar.gz && rm ${WORKINGDIR}/${NVIM}.tar.gz && \
-    echo 'export PATH="$PATH:/opt/${NVIM}/bin"' >> ${WORKINGDIR}/.bashrc \
-  && \
-    # NvChad 
-    git clone https://github.com/NvChad/starter ${WORKINGDIR}/.config/nvim
-
-# Hoogle 
-# The way to do it should be like this: RUN cabal install hoogle 
-# Hoogle has currently a bug so we need to install it from the repo
-
-#RUN git clone https://github.com/ndmitchell/hoogle.git 
-#RUN cd hoogle && cabal install 
-#RUN hoogle generate 
-#RUN rm -fr hoogle 
-
-############################################### 
-# Powerline + Fuzzy Finder configuration
-############################################## 
-
-# Copy activation lines for powerfile 
-COPY ./otherfiles/powerline ${WORKINGDIR}
-
-# Two lines  
-COPY ./otherfiles/default.twolines.json ${WORKINGDIR}
-
-# Activate powerline 
-RUN cat ${WORKINGDIR}/powerline >> ${WORKINGDIR}/.bashrc && rm ${WORKINGDIR}/powerline 
-
-# Activate two lines powerline 
-RUN mv ${WORKINGDIR}/default.twolines.json /usr/share/powerline/config_files/themes/shell
-RUN sed -i 's/default_leftonly/default.twolines/g' /usr/share/powerline/config_files/config.json
-
-RUN echo "alias less='batcat -p'" >> ${WORKINGDIR}/.bashrc 
-RUN echo 'eval $(ssh-agent)' >> ${WORKINGDIR}/.bashrc
-
-# Fuzzy find filer
-
-COPY ./otherfiles/fzf ${WORKINGDIR}
-RUN cat ${WORKINGDIR}/fzf >> ${WORKINGDIR}/.bashrc && rm ${WORKINGDIR}/fzf 
-
-# WORKDIR ${WORKINGDIR}
-
-############################################## 
-# GIT + Lazygit configutarion 
-############################################## 
-
-COPY ./ssh/gituser ${WORKINGDIR} 
-RUN cat ${WORKINGDIR}/gituser >> ${WORKINGDIR}/.bashrc 
-RUN rm -f ${WORKINGDIR}/gituser 
-
-## Lazygit (visual aid for git)
-RUN \ 
-  echo -n 'curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_' > cmd && \
-  echo -n $(cat version) >> cmd && \
-  echo -n '_Linux_x86_64.tar.gz"' >> cmd && \
-  (cat cmd | /bin/sh) && \
-  tar xf lazygit.tar.gz lazygit && \ 
-  install lazygit /usr/local/bin && \
-  rm -f cmd lazygit lazygit.tar.gz version
+RUN curl -LO https://github.com/neovim/neovim/releases/download/v0.11.0/${NVIM}.tar.gz && rm -rf /opt/nvim 
+RUN tar -C /opt -xzf ${WORKINGDIR}/${NVIM}.tar.gz && rm ${WORKINGDIR}/${NVIM}.tar.gz 
+RUN echo 'export PATH="$PATH:/opt/${NVIM}/bin"' >> ${WORKINGDIR}/.bashrc 
+# NvChad 
+RUN git clone https://github.com/NvChad/starter ${WORKINGDIR}/.config/nvim
 
 ############################################## 
 # Configuration for NvChad 
 ############################################## 
-
 # Top-level init
 COPY ./otherfiles/top-init.lua   ${WORKINGDIR}/.config/nvim/init-add.lua
 RUN cat ${WORKINGDIR}/.config/nvim/init-add.lua >> ${WORKINGDIR}/.config/nvim/init.lua
 RUN rm -f ${WORKINGDIR}/.config/nvim/init-add.lua
-
 # Options
 COPY ./otherfiles/options.lua    ${WORKINGDIR}/.config/nvim/lua/
-
 # Autoformatting 
 COPY ./otherfiles/conform.lua    ${WORKINGDIR}/.config/nvim/lua/configs/
-
 # Plugins
 COPY ./otherfiles/init.lua       ${WORKINGDIR}/.config/nvim/lua/plugins/
-
 # Key bindings
 COPY ./otherfiles/mappings.lua   ${WORKINGDIR}/.config/nvim/lua/
-
 # LSP Config (key bindings)
 COPY ./otherfiles/lspconfig.lua  ${WORKINGDIR}/.config/nvim/lua/configs/
-
 # Look of NvChad
 COPY ./otherfiles/chadrc.lua     ${WORKINGDIR}/.config/nvim/lua/
-
 # Options per kind of files 
 RUN mkdir ${WORKINGDIR}/.config/nvim/lua/custom/
 COPY ./otherfiles/autocmds.lua ${WORKINGDIR}/.config/nvim/lua/custom/
-
 # External Nvim tools
 RUN \
     # Installing plugins NEOVIM  
@@ -220,71 +221,61 @@ RUN \
 COPY ./otherfiles/fourmolu.yaml  ${WORKINGDIR}
 RUN mv ${WORKINGDIR}/fourmolu.yaml ${WORKINGDIR}/.local/share/nvim/mason/bin/
 
-############################################## 
-# Tmux configuration
-############################################## 
+# CodeCompanion (AI assistant) in NVIM 
+RUN echo 'export XDG_RUNTIME_DIR=/tmp' >> ${WORKINGDIR}/.bashrc
 
-COPY ./otherfiles/.tmux.conf ${WORKINGDIR}
-
-# Copy the entrypoint script and make it the container's entrypoint
-COPY ./otherfiles/entrypoint.sh /bin/entrypoint
-RUN chmod +x /bin/entrypoint
-
-RUN tmux start-server && \
-    tmux new-session -d && \
-    sleep 1 && \
-    ~/.tmux/plugins/tpm/scripts/install_plugins.sh && \
-    tmux kill-server
-
-
-############################################## 
-# MkDocs
-############################################## 
+################################
+### MkDocs #####################
+################################
+FROM neovim AS mkdocs 
 
 RUN \
   pip install --upgrade Pygments && \
   pip install pymdown-extensions && \
   pip install mkdocs
 
-# Tools for Python development 
+#Tools for Python development 
 RUN pip install scipy 
 
-# Autocomplete 
+################################
+### Haskell ####################
+################################
+FROM mkdocs AS haskell 
+
+# Haskell 
+ENV BOOTSTRAP_HASKELL_NONINTERACTIVE=1
+ENV PATH="${WORKINGDIR}/.ghcup/bin:$PATH"
+ENV PATH=$PATH:${WORKINGDIR}/.cabal/bin
+RUN \ 
+	  # Haskell 
+	  (curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh) \ 
+  && \
+    ghcup install ghc 9.6.7 && ghcup set ghc 9.6.7 \
+  && \ 
+   # Cabal 
+    ghcup install cabal 3.10.1.0 && ghcup set cabal 3.10.1.0 \
+  && \
+   # Haskell HLS
+    ghcup install hls 2.10.0.0 && ghcup set hls 2.10.0.0 \
+  && \
+    # Haskell fast tags 
+    cabal install fast-tags 
+
+# Hoogle 
+# The way to do it should be like this: RUN cabal install hoogle 
+# Hoogle has currently a bug so we need to install it from the repo
+
 RUN \
-	echo "deb [trusted=yes] https://apt.fury.io/rsteube/ /" | sudo tee /etc/apt/sources.list.d/rsteube.list && \
-	apt-get update && apt-get install carapace-bin && \
-	echo "export CARAPACE_BRIDGES='zsh,fish,bash,inshellisense'" >> ${WORKINGDIR}/.bashrc && \
-	echo "source <(carapace _carapace)" >> ${WORKINGDIR}/.bashrc
+	git clone https://github.com/ndmitchell/hoogle.git && cd hoogle && cabal install && \
+	hoogle generate && rm -fr hoogle && cd ${WORKINGDIR} 
 
-# Modern PS (btm) 
-RUN \
-	curl -LO https://github.com/ClementTsang/bottom/releases/download/0.10.2/bottom_0.10.2-1_amd64.deb && \ 
-	dpkg -i bottom_0.10.2-1_amd64.deb && \ 
-	rm bottom_0.10.2-1_amd64.deb
+################################
+### AI #########################
+################################
+FROM haskell AS ai 
 
-# Modern du (dust)
-RUN \
-	curl -LO https://github.com/bootandy/dust/releases/download/v1.2.0/du-dust_1.2.0-1_amd64.deb && \
-	dpkg -i du-dust_1.2.0-1_amd64.deb && \ 
-	rm du-dust_1.2.0-1_amd64.deb
+# Claude code 
+RUN npm install -g @anthropic-ai/claude-code
 
-# Eza (modern ls)
-RUN \
-	mkdir -p /etc/apt/keyrings && \
-	(wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | gpg --dearmor -o /etc/apt/keyrings/gierens.gpg) && \ 
-	echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list && \ 
-	chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list && \ 
-	apt update && apt install -y eza && \ 
-	echo "alias ls='eza --icons --git -a'" >> ${WORKINGDIR}/.bashrc && \ 
-	echo "alias ll='eza -l --icons --git -a'" >> ${WORKINGDIR}/.bashrc
-
-# VIM motions in bash 
-RUN echo "set -o vi" >> ${WORKINGDIR}/.bashrc
-
-# FZF keyshort 
-RUN echo 'eval "$(fzf --bash)"' >> ${WORKINGDIR}/.bashrc
-
-# CodeCompanion in NVIM 
-RUN echo 'export XDG_RUNTIME_DIR=/tmp' >> ${WORKINGDIR}/.bashrc
 
 ENTRYPOINT [ "/bin/entrypoint" ]

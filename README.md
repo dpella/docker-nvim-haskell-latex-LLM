@@ -29,7 +29,10 @@ You have all of NvChad with the addition of severals plugins and configurations 
 - Keeping tracks of comments of the form `TODO:`, `HACK:`, and `BUG:` (`]t` and `[t` for next an prev comment)
 - Save and restore sessions (`<leader> z`)
 - LLM Support (OpenAI) 
-	- with Avante (`<leader>at` toggle prompt, `<leader>aa` to ask, `<leader ae>` to directly edit) 
+	- with CodeCompanion (`<leader>at` toggle prompt, `<leader>aa` to ask (visual mode)) 
+  - `<leader> ga` while in the code companion will change the "adapter" (i.e., chatGPT, Claude, etc.)
+  - `ga` accept proposals 
+  - `gr` reject proposals
 - Welcome screen of DPella (the company where I work)
 - Editing tips
 	- `<C-\><C-n>` to get out of the terminal mode back into nvim 
@@ -59,7 +62,7 @@ This is the directory where you should put all your persisten data.
 
 ## SSH Keys:
 
-Once you clone this repo, you should get into `ssh` and add your private /
+Once you clone this repo, you should get into the folder `ssh` and add your private /
 public keys to connect to Github or Bitbucket.
 
 File `key` is the private key file which is **not** passphrase protected. File
@@ -82,34 +85,13 @@ In file `./ssh/gituser`, complete the following lines with your name and email a
 git config --global user.name "Your name here" 
 git config --global user.email you@email.address
 ```
-## LLM (Mistral)
+## Keys for AI services 
 
-You can run LLM inside nvim! The image will be preconfigured with [Mistral AI model](https://mistral.ai/) 
-run via [Ollama](https://ollama.com/). You can run the LLM locally or connect to a remote server via SSH. 
+After clonning the repo, you should go into the folder `ssh` and add your API keys for 
+different AI services. 
 
-Go to the file `./ssh/llm` 
-
-```bash
-LLM_MODE=0  # 0 for local, and 1 for connecting with a remote server via SSH tunneling
-
-# For remote only  
-LLM_SERVER=<your Ollama server>
-LLM_PORT=<port where Ollama is listening, default 2022>
-SSH_USER=<your username to login into the remote machine>
-SSH_PORT=<the port where SSH is listening>
-```
-If you want to change the LLM model or use another port (that is not 2022), you
-should also need to change the file `otherfiles/init.lua`: 
-
-```lua 
-{
-    "David-Kunz/gen.nvim",
-    lazy = false,
-    opts = {
-      model = "mistral:instruct",
-      port = 2022,
-    },
-```
+- For ChatGPT, write the key in the file `chatgpt-key`
+- For Claude, write the key in the file `antropic_key`
 
 # Launch 
 
@@ -127,13 +109,6 @@ docker attach <4 first letters of the container created>
 ```
 
 Once inside the container, type 
-
-```bash 
-./llm.sh
-```
-to start the LLM locally or to connect to the remote server. 
-
-then, 
 
 ```bash 
 nvim 
