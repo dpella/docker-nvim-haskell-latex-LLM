@@ -3,8 +3,8 @@ local options = {
     lua = { "stylua" },
     haskell = { "fourmolu" },
     -- markdown = { "prettier" },
-    -- css = { "prettier" },
-    -- html = { "prettier" },
+    css = { "prettier" },
+    html = { "prettier" },
   },
 
   format_on_save = {
