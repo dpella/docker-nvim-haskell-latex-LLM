@@ -44,8 +44,8 @@ RUN apt-get update \
   && \ 
     apt-get install -y --no-install-recommends \
 	  # LaTeX packages 
-	  #texlive-xetex zathura latexmk texlive-luatex ttf-mscorefonts-installer texlive-science \
-	  #texlive-extra-utils texlive-bibtex-extra python3-pygments biber texlive-fonts-extra lhs2tex \
+	  texlive-xetex zathura latexmk texlive-luatex ttf-mscorefonts-installer texlive-science \
+	  texlive-extra-utils texlive-bibtex-extra python3-pygments biber texlive-fonts-extra lhs2tex \
   && \
 	  # Setting up SSH
 	  mkdir ~/.ssh && touch ~/.ssh/known_hosts && ssh-keyscan github.com >> ~/.ssh/known_hosts \
