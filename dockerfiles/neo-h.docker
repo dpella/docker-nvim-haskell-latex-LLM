@@ -232,6 +232,7 @@ FROM neovim AS mkdocs
 RUN \
   pip install --upgrade Pygments && \
   pip install pymdown-extensions && \
+  pip install mkdocs-include-markdown-plugin && \
   pip install mkdocs
 
 #Tools for Python development 
