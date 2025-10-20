@@ -234,6 +234,7 @@ RUN \
   pip install pymdown-extensions && \
   pip install mkdocs-include-markdown-plugin && \
   pip install mkdocs-print-site-plugin && \
+  pip install mkdocs-excel-plugin && \
   pip install mkdocs
 
 #Tools for Python development 
