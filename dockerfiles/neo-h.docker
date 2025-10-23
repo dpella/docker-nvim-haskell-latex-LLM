@@ -233,7 +233,7 @@ RUN \
   pip install --upgrade Pygments && \
   pip install pymdown-extensions && \
   pip install mkdocs-include-markdown-plugin && \
-  pip install mkdocs-print-site-plugin && \
+  pip install mkdocs-material && \
   pip install mkdocs-excel-plugin && \
   pip install mkdocs-page-pdf && \
   pip install mkdocs
