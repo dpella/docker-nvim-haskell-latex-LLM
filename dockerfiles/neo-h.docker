@@ -240,15 +240,27 @@ RUN \
 
 ## This is for rendering pages into PDF 
 RUN apt-get update \
-    && apt-get install -y wget gnupg \
-    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
-      --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/* \
-    && npm init -y &&  \
-       npm i puppeteer
+ && apt-get install -y --no-install-recommends wget gnupg curl ca-certificates \
+ # (A) Add Chrome repo cleanly (no duplicate), then install Chrome + fonts
+ && install -d /etc/apt/keyrings \
+ && curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /etc/apt/keyrings/google-linux.gpg \
+ && echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google-linux.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends \
+      google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg \
+      fonts-kacst fonts-freefont-ttf libxss1 \
+ # (B) Remove Ubuntu’s Node 12 packages that conflict with NodeSource
+ && apt-get purge -y npm nodejs libnode-dev libnode72 || true \
+ && apt-get autoremove -y \
+ # (C) Install Node 18 from NodeSource
+ && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+ && apt-get install -y nodejs \
+ && node -v && npm -v \
+ # (D) Puppeteer
+ && npm init -y \
+ && npm i puppeteer \
+ # (E) Clean
+ && rm -rf /var/lib/apt/lists/*
 
 #Tools for Python development 
 RUN pip install scipy 
