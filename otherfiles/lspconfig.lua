@@ -123,6 +123,9 @@ vim.lsp.config("ltex", {
   },
 })
 
+-- Enable ltex for markdown, text, and tex files
+vim.lsp.enable("ltex", { "markdown", "text", "tex" })
+
 -- configuring single server, example: typescript
 -- vim.lsp.config("ts_ls", {
 --   on_attach = nvlsp.on_attach,
