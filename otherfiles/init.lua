@@ -136,6 +136,16 @@ return {
     "nvim-telescope/telescope-bibtex.nvim",
     dependencies = { "nvim-telescope/telescope.nvim" },
     config = function()
+      require("telescope").setup {
+        extensions = {
+          bibtex = {
+            -- Enable context awareness to find \bibliography{} in tex files
+            context = true,
+            -- Fallback to global/directory .bib files if context not found
+            context_fallback = true,
+          },
+        },
+      }
       require("telescope").load_extension "bibtex"
     end,
   },
