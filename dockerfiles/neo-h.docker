@@ -195,9 +195,13 @@ RUN \
 		echo "alias ls='eza --icons --git -a'" >> ${WORKINGDIR}/.bashrc && \ 
 		echo "alias ll='eza -l --icons --git -a'" >> ${WORKINGDIR}/.bashrc \
 	&& \
-    # Fuzzy finder 
-    git clone --depth 1 https://github.com/junegunn/fzf.git ${WORKINGDIR}/.fzf && \ 
+    # Fuzzy finder
+    git clone --depth 1 https://github.com/junegunn/fzf.git ${WORKINGDIR}/.fzf && \
     cd ${WORKINGDIR}/.fzf && ./install --all && cd ${WORKINGDIR} \
+  && \
+    # Zoxide (modern cd)
+    curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh -s -- --bin-dir=/usr/local/bin && \
+    echo 'eval "$(zoxide init bash)"' >> ${WORKINGDIR}/.bashrc \
   && \
     # Lazygit (visual aid for git)
     (curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*' > version) && \ 
