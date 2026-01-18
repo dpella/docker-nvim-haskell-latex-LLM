@@ -171,7 +171,7 @@ ENV NVIM="nvim-linux-x86_64"
 # Install NVM and Node.js (required for NeoVim)
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash 
 RUN . "$NVM_DIR/nvm.sh" && nvm install $NODE_VERSION && nvm alias default $NODE_VERSION && \
-	nvm use $NODE_VERSION && npm install -g tree-sitter-cli 
+	nvm use $NODE_VERSION && npm install -g tree-sitter-cli@0.20.8 
 
 # Install luarocks 
 RUN luarocks install jsregexp 
