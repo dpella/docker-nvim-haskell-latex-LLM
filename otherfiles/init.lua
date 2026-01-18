@@ -36,8 +36,11 @@ return {
         "regex",
       },
     },
+    config = function(_, opts)
+      -- Use the new module name (config instead of configs)
+      require("nvim-treesitter.config").setup(opts)
+    end,
   },
-
   -- Maximizes a split for a moment
   {
     "szw/vim-maximizer",
