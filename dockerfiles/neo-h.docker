@@ -263,6 +263,26 @@ RUN echo 'eval "$(fzf --bash)"' >> ${WORKINGDIR}/.bashrc
 ################################
 FROM utils-cli AS neovim-config
 
+# NVM (required by NeoVim) 
+ENV NVM_DIR=/root/.nvm
+ENV NODE_VERSION=18
+# Make node, npm, and tree-sitter available globally
+ENV PATH="$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH"
+# NeoVim 
+ENV NVIM="nvim-linux-x86_64"
+
+# Install NVM and Node.js (required for NeoVim)
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash 
+RUN . "$NVM_DIR/nvm.sh" && nvm install $NODE_VERSION && nvm alias default $NODE_VERSION && \
+	nvm use $NODE_VERSION && npm install -g tree-sitter-cli@0.20.8 
+
+# Install luarocks 
+RUN luarocks install jsregexp 
+
+# Install NeoVim 
+RUN curl -LO https://github.com/neovim/neovim/releases/download/v0.11.0/${NVIM}.tar.gz && rm -rf /opt/nvim 
+RUN tar -C /opt -xzf ${WORKINGDIR}/${NVIM}.tar.gz && rm ${WORKINGDIR}/${NVIM}.tar.gz 
+RUN echo 'export PATH="$PATH:/opt/${NVIM}/bin"' >> ${WORKINGDIR}/.bashrc 
 # NvChad 
 RUN git clone https://github.com/NvChad/starter ${WORKINGDIR}/.config/nvim
 
