@@ -4,7 +4,14 @@ This repository builds a docker image of NvChad -- a customization of Neo Vim.
 
 You have all of NvChad with the addition of severals plugins and configurations to:
 
-- Develop in Haskell (language server) 
+## Programming 
+    - Smart rename (position in a word and hit `<leader>sr`)
+    - Global rename (position in a word and hit `<leader>s`)
+    - Keeping tracks of comments of the form `TODO:`, `HACK:`, and `BUG:` (`]t` and `[t` for next an prev comment)
+    - Save and restore sessions (`<leader> z`)
+    - `za` folds/opens code
+
+## Develop in Haskell (language server) 
 	- `<leader>ld` shows all the errors/suggestions 
 	- `<leader>lt` shows all tags 
 	- `<leader>ls` shows all symbols
@@ -19,22 +26,23 @@ You have all of NvChad with the addition of severals plugins and configurations 
 	- `]d` next suggestion/error
 	- `[d` previous suggestion/error 
 	- `<leader>ts` provides type-signatures that fit a type-hole using Hoogle
-- Write markdown documents (language server) 
-- Write, compile, and visualize Latex documents (`<leader> cl`)
-- Manage repositories and commits (Lazygit, `<leader>gg`)
-- Auto-indentation when saving files (`*.hs`, `*.tex`, `*.lua`)
-- Dictionary and writting suggestion by ltex 
-- Smart rename (position in a word and hit `<leader>sr`)
-- Global rename (position in a word and hit `<leader>s`)
-- Keeping tracks of comments of the form `TODO:`, `HACK:`, and `BUG:` (`]t` and `[t` for next an prev comment)
-- Save and restore sessions (`<leader> z`)
-- LLM Support (OpenAI) 
-	- with CodeCompanion (`<leader>at` toggle prompt, `<leader>aa` to ask (visual mode)) 
+
+## AI integration (LLM Support)
+  - with CodeCompanion (`<leader>at` toggle prompt, `<leader>aa` to ask (visual mode)) 
   - `<leader> ga` while in the code companion will change the "adapter" (i.e., chatGPT, Claude, etc.)
   - `ga` accept proposals 
   - `gr` reject proposals
-- Welcome screen of DPella (the company where I work)
-- Editing tips
+
+## Text editing 
+    - Write markdown documents (language server) 
+    - Write, compile, and visualize Latex documents (`<leader> cl`)
+    - Manage repositories and commits (Lazygit, `<leader>gg`)
+    - Auto-indentation when saving files (`*.hs`, `*.tex`, `*.lua`)
+    - Dictionary and writting suggestion by ltex 
+
+## Editing tips
+    - `Ctrl+w` for all windows related things (resize, swap, etc.)
+    - `:tabe .` to select a file an open it in a different tab
 	- `<C-\><C-n>` to get out of the terminal mode back into nvim 
 	- `viw` select the current word 
 	- `vi{` select the text around `{`
@@ -48,17 +56,20 @@ You have all of NvChad with the addition of severals plugins and configurations 
         - `f<character>` finds the next `<character>` in the current line, `F<character>` does it backwards. 
           `;` repeats the find and `,` in opposite direction
 
-- `Ctrl+w` for all windows related things (resize, swap, etc.)
-- `:tabe .` to select a file an open it in a different tab
-- `za` folds/opens code
-- If something is not working, write `:checkhealth` for the whole nvim, or `:checkhealth <pluginname>`
-- Latex
+## Latex 
 	- `<leader> bb` searching in bibliography
-- Tmux 
-	- `<C-q>` Main horizontal 
-  - `<C-w>` Main vertical 
-  - `<C-a>` Even horizontal 
-  - `<C-s>` Even vertical
+
+## Tmux 
+    - `<C-q>` Main horizontal 
+    - `<C-w>` Main vertical 
+    - `<C-a>` Even horizontal 
+    - `<C-s>` Even vertical
+
+## Others 
+    - Welcome screen of DPella (the company where I work)
+    - NvChad: If something is not working, write `:checkhealth` for the whole nvim, or `:checkhealth <pluginname>`
+    - Use `z` instead of `cd` to quickly jump into folder, e.g., `z /vol/data/ccs` first and then 
+      it is enough to do `z ccs` to go back to that folder.
 
 All of the docker images will have a volume associated with it and mounted in `/vol`.
 This is the directory where you should put all your persisten data.
