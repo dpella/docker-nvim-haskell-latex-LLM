@@ -168,6 +168,9 @@ You can build this docker directly from Windows, but you need to
 
 - install [X-11 server in Windows](https://github.com/marchaesen/vcxsrv/releases)
 
+- go to `C:\VcXsrv\vcxsrv.exe`, right click, properties, compatibility, change high DPI settings, 
+  and check "Override high DPI scalling behavior. Scalling performed by: Application"
+
 - clone this repo, 
 
 - Then, you can launch the dockerfiles as 
