@@ -156,9 +156,21 @@ You can build this docker directly from Windows, but you need to
   C:\Users\<Name of User>\.ssh\key
   ```
 
-- and install [X-11 server in Windows](https://github.com/marchaesen/vcxsrv/releases)
+- write `C:\Users\<Name of User>\.ssh\config`
 
-Then, you can launch the dockerfiles as 
+ ```text
+ Host github.com
+      HostName github.com
+      User git
+      IdentityFile C:\Users\AlejandroRusso\.ssh\key
+      IdentitiesOnly yes
+```
+
+- install [X-11 server in Windows](https://github.com/marchaesen/vcxsrv/releases)
+
+- clone this repo, 
+
+- Then, you can launch the dockerfiles as 
 
 ```bash 
 .\launch.ps1 <image name>
