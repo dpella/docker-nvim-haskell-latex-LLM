@@ -74,7 +74,8 @@ $dockerArgs = @(
     "-it",
     "-v", "${dockerPath}/ssh:/tmp/ssh:ro",
     "-v", "${IMAGE}:/vol",
-    "-e", "TERM=xterm-256color"
+    "-e", "TERM=xterm-256color",
+    "-e", "DISPLAY=host.docker.internal:0"
 )
 
 # Add port option if needed
