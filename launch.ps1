@@ -74,8 +74,13 @@ $dockerArgs = @(
     "-it",
     "-v", "${dockerPath}/ssh:/tmp/ssh:ro",
     "-v", "${IMAGE}:/vol",
+    "-v", "/tmp/.X11-unix:/tmp/.X11-unix",
+    "-v", "/mnt/wslg:/mnt/wslg",
     "-e", "TERM=xterm-256color",
-    "-e", "DISPLAY=host.docker.internal:0"
+    "-e", "DISPLAY=${env:DISPLAY}",
+    "-e", "WAYLAND_DISPLAY=${env:WAYLAND_DISPLAY}",
+    "-e", "XDG_RUNTIME_DIR=${env:XDG_RUNTIME_DIR}",
+    "-e", "PULSE_SERVER=${env:PULSE_SERVER}"
 )
 
 # Add port option if needed
