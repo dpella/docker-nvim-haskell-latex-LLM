@@ -131,6 +131,54 @@ nvim
 ```
 Enjoy! 
 
+# Windows users 
+
+You can build this docker directly from Windows, but you need to 
+
+- install ssh by running Powershell as root; 
+
+ ```bash 
+ Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0 
+ ```
+
+- enable running Powershell scripts for your user (again as root);
+
+ ```bash 
+ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+ ```
+- close the privileged powershell and start a new one (user level);
+
+- install [git for windows](https://git-scm.com/download/win); 
+
+- write your secret key file in 
+  
+  ```bash 
+  C:\Users\<Name of User>\.ssh\key
+  ```
+
+- write `C:\Users\<Name of User>\.ssh\config`
+
+ ```text
+ Host github.com
+      HostName github.com
+      User git
+      IdentityFile C:\Users\AlejandroRusso\.ssh\key
+      IdentitiesOnly yes
+```
+
+- install [X-11 server in Windows](https://github.com/marchaesen/vcxsrv/releases)
+
+- go to `C:\VcXsrv\vcxsrv.exe`, right click, properties, compatibility, change high DPI settings, 
+  and check "Override high DPI scalling behavior. Scalling performed by: Application"
+
+- clone this repo, 
+
+- Then, you can launch the dockerfiles as 
+
+```bash 
+.\launch.ps1 <image name>
+```
+
 # Customization 
 
 - Welcome banner: `./otherfiles/chadrc.lua` 
