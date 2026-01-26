@@ -83,16 +83,26 @@ if ($isWSL) {
 
     if (-not $vcxsrvRunning) {
         Write-Host "VcXsrv not running. Starting VcXsrv..."
-        $configPath = Join-Path $PSScriptRoot "config.xlaunch"
 
-        if (Test-Path $configPath) {
-            Start-Process -FilePath $configPath
-            Write-Host "Waiting for VcXsrv to start..."
+        # Try to find VcXsrv executable
+        $vcxsrvPaths = @(
+            "C:\Program Files\VcXsrv\vcxsrv.exe",
+            "C:\Program Files (x86)\VcXsrv\vcxsrv.exe",
+            "${env:ProgramFiles}\VcXsrv\vcxsrv.exe",
+            "${env:ProgramFiles(x86)}\VcXsrv\vcxsrv.exe"
+        )
+
+        $vcxsrvExe = $vcxsrvPaths | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+        if ($vcxsrvExe) {
+            # Launch VcXsrv with proper settings (multiwindow, clipboard, DPI)
+            Start-Process -FilePath $vcxsrvExe -ArgumentList ":0 -multiwindow -clipboard -wgl -ac -dpi 144" -WindowStyle Hidden
+            Write-Host "VcXsrv started. Waiting for initialization..."
             Start-Sleep -Seconds 3
         } else {
-            Write-Host "Warning: config.xlaunch not found at $configPath"
-            Write-Host "Please start VcXsrv manually before continuing."
-            Read-Host "Press Enter once VcXsrv is running"
+            Write-Host "ERROR: VcXsrv not found. Please install VcXsrv from:"
+            Write-Host "https://sourceforge.net/projects/vcxsrv/"
+            exit 1
         }
     } else {
         Write-Host "VcXsrv is already running"
