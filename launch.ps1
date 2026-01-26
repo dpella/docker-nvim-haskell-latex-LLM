@@ -63,7 +63,7 @@ if ($IMAGE -eq "neo-h") {
 }
 
 # Detect if running in WSL or native Windows
-$isWSL = Test-Path "/proc/version" -and (Get-Content "/proc/version" -ErrorAction SilentlyContinue) -match "microsoft"
+$isWSL = (Test-Path "/proc/version") -and ((Get-Content "/proc/version" -ErrorAction SilentlyContinue) -match "microsoft")
 
 # Configure X11 based on environment
 if ($isWSL) {
