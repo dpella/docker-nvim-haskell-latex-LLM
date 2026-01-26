@@ -111,8 +111,8 @@ if ($isWSL) {
         }
 
         if ($vcxsrvExe) {
-            # Launch VcXsrv with proper settings (multiwindow, clipboard, DPI)
-            Start-Process -FilePath $vcxsrvExe -ArgumentList ":0 -multiwindow -clipboard -wgl -ac -dpi 144" -WindowStyle Hidden
+            # Launch VcXsrv with proper settings (multiwindow, clipboard, DPI auto-detection)
+            Start-Process -FilePath $vcxsrvExe -ArgumentList ":0 -multiwindow -clipboard -wgl -ac -nodpi -dpms" -WindowStyle Hidden
             Write-Host "VcXsrv started. Waiting for initialization..."
             Start-Sleep -Seconds 3
         } else {
