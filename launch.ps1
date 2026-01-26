@@ -75,53 +75,49 @@ if ($isWSL) {
     )
     $displayVar = $env:DISPLAY
 } else {
-    # Native Windows - use VcXsrv
-    Write-Host "Detected Windows environment - configuring for VcXsrv"
+    # Native Windows - use X410
+    Write-Host "Detected Windows environment - configuring for X410"
 
-    # Check if VcXsrv is already running
-    $vcxsrvRunning = Get-Process -Name "vcxsrv" -ErrorAction SilentlyContinue
+    # Check if X410 is already running
+    $x410Running = Get-Process -Name "X410" -ErrorAction SilentlyContinue
 
-    if (-not $vcxsrvRunning) {
-        Write-Host "VcXsrv not running. Starting VcXsrv..."
+    if (-not $x410Running) {
+        Write-Host "X410 not running. Starting X410..."
 
-        # Try to find VcXsrv executable
-        $vcxsrvPaths = @(
-            "C:\Program Files\VcXsrv\vcxsrv.exe",
-            "C:\Program Files (x86)\VcXsrv\vcxsrv.exe",
-            "${env:ProgramFiles}\VcXsrv\vcxsrv.exe",
-            "${env:ProgramFiles(x86)}\VcXsrv\vcxsrv.exe",
-            "${env:LOCALAPPDATA}\Programs\VcXsrv\vcxsrv.exe",
-            "${env:APPDATA}\Programs\VcXsrv\vcxsrv.exe"
+        # Try to find X410 executable (Microsoft Store app)
+        $x410Paths = @(
+            "${env:LOCALAPPDATA}\Microsoft\WindowsApps\X410.exe",
+            "C:\Program Files\WindowsApps\*X410*\X410.exe"
         )
 
-        $vcxsrvExe = $vcxsrvPaths | Where-Object { Test-Path $_ } | Select-Object -First 1
-
-        # If not found in standard paths, try to find it via shortcut
-        if (-not $vcxsrvExe) {
-            $shortcutPath = "${env:APPDATA}\Microsoft\Windows\Start Menu\Programs\VcXsrv\XLaunch.lnk"
-            if (Test-Path $shortcutPath) {
-                $shell = New-Object -ComObject WScript.Shell
-                $shortcut = $shell.CreateShortcut($shortcutPath)
-                $vcxsrvDir = Split-Path $shortcut.TargetPath
-                $vcxsrvExe = Join-Path $vcxsrvDir "vcxsrv.exe"
-                if (-not (Test-Path $vcxsrvExe)) {
-                    $vcxsrvExe = $null
+        $x410Exe = $null
+        foreach ($path in $x410Paths) {
+            if ($path -like "*`**") {
+                # Handle wildcard path
+                $resolved = Get-ChildItem -Path ($path -replace '\*[^\\]*$', '') -Filter "X410.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+                if ($resolved) {
+                    $x410Exe = $resolved.FullName
+                    break
                 }
+            } elseif (Test-Path $path) {
+                $x410Exe = $path
+                break
             }
         }
 
-        if ($vcxsrvExe) {
-            # Launch VcXsrv with proper settings (multiwindow, clipboard, DPI)
-            Start-Process -FilePath $vcxsrvExe -ArgumentList ":0 -multiwindow -clipboard -wgl -ac -dpi 144" -WindowStyle Hidden
-            Write-Host "VcXsrv started. Waiting for initialization..."
+        if ($x410Exe) {
+            # Launch X410 in windowed apps mode (similar to VcXsrv multiwindow)
+            Start-Process -FilePath $x410Exe -ArgumentList "/wm" -WindowStyle Hidden
+            Write-Host "X410 started. Waiting for initialization..."
             Start-Sleep -Seconds 3
         } else {
-            Write-Host "ERROR: VcXsrv not found. Please install VcXsrv from:"
-            Write-Host "https://sourceforge.net/projects/vcxsrv/"
+            Write-Host "ERROR: X410 not found. Please install X410 from the Microsoft Store:"
+            Write-Host "https://www.microsoft.com/store/productId/9NLP712ZMN9Q"
+            Write-Host "After installation, you may need to run it once manually to complete setup."
             exit 1
         }
     } else {
-        Write-Host "VcXsrv is already running"
+        Write-Host "X410 is already running"
     }
 
     $x11Volumes = @()
