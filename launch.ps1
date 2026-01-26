@@ -62,10 +62,26 @@ if ($IMAGE -eq "neo-h") {
     $portOption = @("-p", "0.0.0.0:8000:8000")
 }
 
+# Detect if running in WSL or native Windows
+$isWSL = Test-Path "/proc/version" -and (Get-Content "/proc/version" -ErrorAction SilentlyContinue) -match "microsoft"
+
+# Configure X11 based on environment
+if ($isWSL) {
+    # WSL environment - use WSLg
+    Write-Host "Detected WSL environment - using WSLg"
+    $x11Volumes = @(
+        "-v", "/tmp/.X11-unix:/tmp/.X11-unix",
+        "-v", "/mnt/wslg:/mnt/wslg"
+    )
+    $displayVar = $env:DISPLAY
+} else {
+    # Native Windows - use VcXsrv
+    Write-Host "Detected Windows environment - configuring for VcXsrv"
+    $x11Volumes = @()
+    $displayVar = "host.docker.internal:0.0"
+}
+
 # Build docker run command
-# Note: X11/Wayland options removed as they're WSL-specific
-# If you need GUI support on Windows, consider using Docker Desktop's display forwarding
-# or an X server like VcXsrv
 $dockerArgs = @(
     "run",
     "--rm",
@@ -73,15 +89,28 @@ $dockerArgs = @(
     "--cpus=8",
     "-it",
     "-v", "${dockerPath}/ssh:/tmp/ssh:ro",
-    "-v", "${IMAGE}:/vol",
-    "-v", "/tmp/.X11-unix:/tmp/.X11-unix",
-    "-v", "/mnt/wslg:/mnt/wslg",
-    "-e", "TERM=xterm-256color",
-    "-e", "DISPLAY=${env:DISPLAY}",
-    "-e", "WAYLAND_DISPLAY=${env:WAYLAND_DISPLAY}",
-    "-e", "XDG_RUNTIME_DIR=${env:XDG_RUNTIME_DIR}",
-    "-e", "PULSE_SERVER=${env:PULSE_SERVER}"
+    "-v", "${IMAGE}:/vol"
 )
+
+# Add X11 volumes if in WSL
+if ($x11Volumes.Count -gt 0) {
+    $dockerArgs += $x11Volumes
+}
+
+# Add environment variables
+$dockerArgs += @(
+    "-e", "TERM=xterm-256color",
+    "-e", "DISPLAY=$displayVar"
+)
+
+# Add WSL-specific environment variables if in WSL
+if ($isWSL) {
+    $dockerArgs += @(
+        "-e", "WAYLAND_DISPLAY=${env:WAYLAND_DISPLAY}",
+        "-e", "XDG_RUNTIME_DIR=${env:XDG_RUNTIME_DIR}",
+        "-e", "PULSE_SERVER=${env:PULSE_SERVER}"
+    )
+}
 
 # Add port option if needed
 if ($portOption.Count -gt 0) {
