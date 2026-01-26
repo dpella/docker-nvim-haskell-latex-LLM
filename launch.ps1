@@ -77,6 +77,27 @@ if ($isWSL) {
 } else {
     # Native Windows - use VcXsrv
     Write-Host "Detected Windows environment - configuring for VcXsrv"
+
+    # Check if VcXsrv is already running
+    $vcxsrvRunning = Get-Process -Name "vcxsrv" -ErrorAction SilentlyContinue
+
+    if (-not $vcxsrvRunning) {
+        Write-Host "VcXsrv not running. Starting VcXsrv..."
+        $configPath = Join-Path $PSScriptRoot "config.xlaunch"
+
+        if (Test-Path $configPath) {
+            Start-Process -FilePath $configPath
+            Write-Host "Waiting for VcXsrv to start..."
+            Start-Sleep -Seconds 3
+        } else {
+            Write-Host "Warning: config.xlaunch not found at $configPath"
+            Write-Host "Please start VcXsrv manually before continuing."
+            Read-Host "Press Enter once VcXsrv is running"
+        }
+    } else {
+        Write-Host "VcXsrv is already running"
+    }
+
     $x11Volumes = @()
     $displayVar = "host.docker.internal:0.0"
 }
@@ -102,6 +123,15 @@ $dockerArgs += @(
     "-e", "TERM=xterm-256color",
     "-e", "DISPLAY=$displayVar"
 )
+
+# Add DPI settings for better resolution (especially for Windows/VcXsrv)
+if (-not $isWSL) {
+    $dockerArgs += @(
+        "-e", "GDK_SCALE=1",
+        "-e", "GDK_DPI_SCALE=1.5",
+        "-e", "QT_SCALE_FACTOR=1.5"
+    )
+}
 
 # Add WSL-specific environment variables if in WSL
 if ($isWSL) {
