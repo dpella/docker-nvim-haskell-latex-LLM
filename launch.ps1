@@ -89,10 +89,26 @@ if ($isWSL) {
             "C:\Program Files\VcXsrv\vcxsrv.exe",
             "C:\Program Files (x86)\VcXsrv\vcxsrv.exe",
             "${env:ProgramFiles}\VcXsrv\vcxsrv.exe",
-            "${env:ProgramFiles(x86)}\VcXsrv\vcxsrv.exe"
+            "${env:ProgramFiles(x86)}\VcXsrv\vcxsrv.exe",
+            "${env:LOCALAPPDATA}\Programs\VcXsrv\vcxsrv.exe",
+            "${env:APPDATA}\Programs\VcXsrv\vcxsrv.exe"
         )
 
         $vcxsrvExe = $vcxsrvPaths | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+        # If not found in standard paths, try to find it via shortcut
+        if (-not $vcxsrvExe) {
+            $shortcutPath = "${env:APPDATA}\Microsoft\Windows\Start Menu\Programs\VcXsrv\XLaunch.lnk"
+            if (Test-Path $shortcutPath) {
+                $shell = New-Object -ComObject WScript.Shell
+                $shortcut = $shell.CreateShortcut($shortcutPath)
+                $vcxsrvDir = Split-Path $shortcut.TargetPath
+                $vcxsrvExe = Join-Path $vcxsrvDir "vcxsrv.exe"
+                if (-not (Test-Path $vcxsrvExe)) {
+                    $vcxsrvExe = $null
+                }
+            }
+        }
 
         if ($vcxsrvExe) {
             # Launch VcXsrv with proper settings (multiwindow, clipboard, DPI)
