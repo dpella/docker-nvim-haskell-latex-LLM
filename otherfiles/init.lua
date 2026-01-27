@@ -347,4 +347,14 @@ return {
     "christoomey/vim-tmux-navigator",
     lazy = false, -- always load this plugin
   },
+  {
+    "0xferrous/ansi.nvim",
+    lazy = false,
+    config = function()
+      require("ansi").setup {
+        auto_enable = true, -- Auto-enable for configured filetypes
+        filetypes = { "log", "ansi", "ans" }, -- Filetypes to auto-enable
+      }
+    end,
+  },
 }

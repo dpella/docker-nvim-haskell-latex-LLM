@@ -4,6 +4,10 @@ This repository builds a docker image of NvChad -- a customization of Neo Vim.
 
 You have all of NvChad with the addition of severals plugins and configurations to:
 
+## ANSI 
+
+Support for ANSI files (`:AnsiEnable` and `:AnsiDisable`)
+
 ## Programming 
     - Smart rename (position in a word and hit `<leader>sr`)
     - Global rename (position in a word and hit `<leader>s`)
