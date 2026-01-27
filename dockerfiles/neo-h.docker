@@ -332,8 +332,15 @@ RUN echo 'export XDG_RUNTIME_DIR=/tmp' >> ${WORKINGDIR}/.bashrc
 ################################
 FROM neovim-config AS ai 
 
-# Claude code 
+# Claude code
 RUN npm install -g @anthropic-ai/claude-code
+
+# ANSI welcome screen
+RUN git clone https://github.com/alejandrorusso/ansi-welcome.git ${WORKINGDIR}/ansi-welcome && \
+    chmod +x ${WORKINGDIR}/ansi-welcome/random-ansi.sh
+RUN echo '' >> ${WORKINGDIR}/.bashrc && \
+    echo '# Display random ANSI welcome message' >> ${WORKINGDIR}/.bashrc && \
+    echo '${HOME}/ansi-welcome/random-ansi.sh' >> ${WORKINGDIR}/.bashrc
 
 
 ENTRYPOINT [ "/bin/entrypoint" ]
