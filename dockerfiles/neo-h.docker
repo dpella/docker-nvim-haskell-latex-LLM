@@ -336,11 +336,11 @@ FROM neovim-config AS ai
 RUN npm install -g @anthropic-ai/claude-code
 
 # ANSI welcome screen
-RUN git clone https://github.com/alejandrorusso/ansi-welcome.git ${WORKINGDIR}/ansi-welcome && \
-    chmod +x ${WORKINGDIR}/ansi-welcome/random-ansi.sh
+RUN git clone https://github.com/alejandrorusso/ansi-welcome.git ${WORKINGDIR}/.ansi-welcome && \
+    chmod +x ${WORKINGDIR}/.ansi-welcome/random-ansi.sh
 RUN echo '' >> ${WORKINGDIR}/.bashrc && \
     echo '# Display random ANSI welcome message' >> ${WORKINGDIR}/.bashrc && \
-    echo '${HOME}/ansi-welcome/random-ansi.sh' >> ${WORKINGDIR}/.bashrc
+    echo 'cd ${HOME}/.ansi-welcome && ./random-ansi.sh && cd - > /dev/null' >> ${WORKINGDIR}/.bashrc
 
 
 ENTRYPOINT [ "/bin/entrypoint" ]
