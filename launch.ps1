@@ -32,6 +32,9 @@ $imageExists = docker images --format "{{.Repository}}" | Select-String -Pattern
 if ($imageExists) {
     Write-Host "Image already exists!"
 } else {
+    Write-Host "Fixing line endings before build..."
+    & "$PSScriptRoot/fix-line-endings.ps1"
+
     Write-Host "Building the image..."
     docker build -f "./dockerfiles/${IMAGE}.docker" . --tag "${IMAGE}:devel"
 }
