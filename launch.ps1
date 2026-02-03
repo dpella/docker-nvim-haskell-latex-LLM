@@ -51,6 +51,43 @@ if ($volumeExists) {
 
 Write-Host "Launching the container..."
 
+# Display Windows Explorer path to access the Docker volume
+# Try different path formats for compatibility
+$volumePaths = @(
+    "\\wsl$\docker-desktop-data\data\docker\volumes\${IMAGE}\_data",
+    "\\wsl$\docker-desktop-data\version-pack-data\community\docker\volumes\${IMAGE}\_data"
+)
+
+$volumePath = $null
+foreach ($path in $volumePaths) {
+    if (Test-Path $path -ErrorAction SilentlyContinue) {
+        $volumePath = $path
+        break
+    }
+}
+
+if ($volumePath) {
+    Write-Host ""
+    Write-Host "========================================"
+    Write-Host "Docker volume accessible in Windows Explorer"
+    Write-Host "Path: $volumePath"
+    Write-Host ""
+    Write-Host "Opening volume folder in Windows Explorer..."
+    Start-Process explorer.exe -ArgumentList $volumePath
+    Write-Host "========================================"
+    Write-Host ""
+} else {
+    Write-Host ""
+    Write-Host "========================================"
+    Write-Host "To access the Docker volume in Windows Explorer:"
+    Write-Host "1. Open File Explorer"
+    Write-Host "2. Type in address bar: \\wsl$\"
+    Write-Host "3. Navigate to: docker-desktop-data\data\docker\volumes\${IMAGE}\_data"
+    Write-Host "   (or try: docker-desktop-data\version-pack-data\community\docker\volumes\${IMAGE}\_data)"
+    Write-Host "========================================"
+    Write-Host ""
+}
+
 # Get current directory path (convert to Unix-style for Docker)
 $currentPath = (Get-Location).Path
 # Convert Windows path to Docker-compatible path
