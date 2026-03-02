@@ -151,9 +151,11 @@ ENV PATH="$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH"
 ENV NVIM="nvim-linux-x86_64"
 
 # Install NVM and Node.js (required for NeoVim)
+# tree-sitter-cli@0.25.10 is the latest version compatible with GLIBC 2.35 (Ubuntu 22.04)
+# 0.26.x requires GLIBC 2.39 (Ubuntu 24.04) and will fail at runtime
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 RUN . "$NVM_DIR/nvm.sh" && nvm install $NODE_VERSION && nvm alias default $NODE_VERSION && \
-	nvm use $NODE_VERSION && npm install -g tree-sitter-cli
+	nvm use $NODE_VERSION && npm install -g tree-sitter-cli@0.25.10
 
 # Install luarocks
 RUN luarocks install jsregexp
@@ -274,7 +276,7 @@ ENV NVIM="nvim-linux-x86_64"
 # Install NVM and Node.js (required for NeoVim)
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash 
 RUN . "$NVM_DIR/nvm.sh" && nvm install $NODE_VERSION && nvm alias default $NODE_VERSION && \
-	nvm use $NODE_VERSION && npm install -g tree-sitter-cli@0.20.8 
+	nvm use $NODE_VERSION && npm install -g tree-sitter-cli@0.25.10
 
 # Install luarocks 
 RUN luarocks install jsregexp 
@@ -317,8 +319,10 @@ RUN \
     /opt/${NVIM}/bin/nvim --headless +"MasonUpdate" +q && \
     /opt/${NVIM}/bin/nvim --headless +"MasonInstall marksman stylua lua-language-server prettier@2.8.8" +q && \
     /opt/${NVIM}/bin/nvim --headless +"MasonInstall ltex-ls texlab" +q && \
-    # Haskell code formatter 
-    /opt/${NVIM}/bin/nvim --headless +"MasonInstall fourmolu" +q 
+    # Haskell code formatter
+    /opt/${NVIM}/bin/nvim --headless +"MasonInstall fourmolu" +q && \
+    # Treesitter parsers (yaml required by codecompanion prompt library)
+    /opt/${NVIM}/bin/nvim --headless +"TSInstall yaml" +q
 
 # File format options for Haskell code 
 COPY ./otherfiles/fourmolu.yaml  ${WORKINGDIR}
