@@ -321,6 +321,8 @@ RUN \
     /opt/${NVIM}/bin/nvim --headless +"MasonInstall ltex-ls texlab" +q && \
     # Haskell code formatter
     /opt/${NVIM}/bin/nvim --headless +"MasonInstall fourmolu" +q && \
+    # C/C++ language server
+    /opt/${NVIM}/bin/nvim --headless +"MasonInstall clangd" +q && \
     # Treesitter parsers (yaml required by codecompanion prompt library)
     /opt/${NVIM}/bin/nvim --headless +"TSInstall yaml" +q
 
