@@ -54,7 +54,7 @@ echo "Launching the container..."
 PORT_OPTION=""
 
 if [ "${IMAGE}" = "neo-h" ]; then
-    PORT_OPTION="-p 0.0.0.0:8000:8000"
+    PORT_OPTION="-p 0.0.0.0:8000:8000 -p 0.0.0.0:2222:2222"
 fi
 
 docker run --rm \
