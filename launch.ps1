@@ -99,7 +99,7 @@ if ($dockerPath -match '^([A-Za-z]):') {
 # Port option for neo-h
 $portOption = @()
 if ($IMAGE -eq "neo-h") {
-    $portOption = @("-p", "0.0.0.0:8000:8000")
+    $portOption = @("-p", "0.0.0.0:8000:8000", "-p", "0.0.0.0:2222:2222")
 }
 
 # Detect if running in WSL or native Windows
