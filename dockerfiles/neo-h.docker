@@ -253,6 +253,7 @@ RUN chmod +x /bin/entrypoint
 # Configuration of plugins
 RUN tmux start-server && \
     tmux new-session -d && \
+    tmux source-file ${WORKINGDIR}/.tmux.conf && \
     sleep 1 && \
     ~/.tmux/plugins/tpm/scripts/install_plugins.sh && \
     tmux kill-server
