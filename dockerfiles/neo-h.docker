@@ -77,13 +77,13 @@ RUN \
 	  # Haskell
 	  (curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh) \
   && \
-    ghcup install ghc 9.6.7 && ghcup set ghc 9.6.7 \
+    ghcup install ghc 9.12.2 && ghcup set ghc 9.12.2 \
   && \
    # Cabal
-    ghcup install cabal 3.10.1.0 && ghcup set cabal 3.10.1.0 \
+    ghcup install cabal 3.16.0.0 && ghcup set cabal 3.16.0.0 \
   && \
    # Haskell HLS
-    ghcup install hls 2.10.0.0 && ghcup set hls 2.10.0.0 \
+    ghcup install hls 2.13.0.0 && ghcup set hls 2.13.0.0 \
   && \
     # Haskell fast tags
     cabal install fast-tags
@@ -253,6 +253,7 @@ RUN chmod +x /bin/entrypoint
 # Configuration of plugins
 RUN tmux start-server && \
     tmux new-session -d && \
+    tmux source-file ${WORKINGDIR}/.tmux.conf && \
     sleep 1 && \
     ~/.tmux/plugins/tpm/scripts/install_plugins.sh && \
     tmux kill-server
