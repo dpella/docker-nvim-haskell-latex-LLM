@@ -22,6 +22,7 @@ return {
 				"markdown",
 				"latex",
 				"bibtex",
+				"norg",
 				-- web dev
 				"html",
 				"css",
@@ -353,6 +354,32 @@ return {
 			require("ansi").setup({
 				auto_enable = true, -- Auto-enable for configured filetypes
 				filetypes = { "log", "ansi", "ans" }, -- Filetypes to auto-enable
+			})
+		end,
+	},
+	-- Neorg, structured note-taking
+	{
+		"nvim-neorg/neorg",
+		dependencies = { "nvim-lua/plenary.nvim", "MunifTanjim/nui.nvim", "nvim-neotest/nvim-nio" },
+		lazy = false,
+		version = "*",
+		config = function()
+			require("neorg").setup({
+				load = {
+					["core.defaults"] = {},
+					["core.concealer"] = {},
+					["core.dirman"] = {
+						config = {
+							workspaces = {
+								notes = "/vol/notes",
+							},
+							default_workspace = "notes",
+						},
+					},
+					["core.completion"] = {
+						config = { engine = "nvim-cmp" },
+					},
+				},
 			})
 		end,
 	},
