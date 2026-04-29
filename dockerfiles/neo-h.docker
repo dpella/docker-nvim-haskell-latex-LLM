@@ -327,23 +327,6 @@ RUN \
     # Treesitter parsers (yaml required by codecompanion prompt library)
     /opt/${NVIM}/bin/nvim --headless +"TSInstall yaml" +q
 
-# Build neorg's tree-sitter parsers from source against the system libstdc++.
-# The prebuilt rocks shipped via lazy.nvim require GLIBCXX_3.4.32 (GCC 13+,
-# Ubuntu 24.04+), which Ubuntu 22.04 lacks. The plugin spec sets
-# `configure_parsers = false` so neorg ignores the cpath-resolved prebuilt
-# parser and uses the rtp; we compile from source into site/parser/ for that
-# rtp lookup.
-RUN mkdir -p ${WORKINGDIR}/.local/share/nvim/site/parser && \
-    cd ${WORKINGDIR}/.local/share/nvim/lazy/tree-sitter-norg/src && \
-    gcc -c -fPIC -O2 -I. parser.c   -o /tmp/norg-parser.o && \
-    g++ -c -fPIC -O2 -I. scanner.cc -o /tmp/norg-scanner.o && \
-    g++ -shared -o ${WORKINGDIR}/.local/share/nvim/site/parser/norg.so \
-        /tmp/norg-parser.o /tmp/norg-scanner.o && \
-    cd ${WORKINGDIR}/.local/share/nvim/lazy/tree-sitter-norg-meta/src && \
-    gcc -shared -fPIC -O2 -I. \
-        -o ${WORKINGDIR}/.local/share/nvim/site/parser/norg_meta.so parser.c && \
-    rm -f /tmp/norg-parser.o /tmp/norg-scanner.o
-
 # File format options for Haskell code
 COPY ./otherfiles/fourmolu.yaml  ${WORKINGDIR}
 RUN mv ${WORKINGDIR}/fourmolu.yaml ${WORKINGDIR}/.local/share/nvim/mason/bin/
