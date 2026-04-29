@@ -329,12 +329,11 @@ RUN \
 
 # Build neorg's tree-sitter parsers from source against the system libstdc++.
 # The prebuilt rocks shipped via lazy.nvim require GLIBCXX_3.4.32 (GCC 13+,
-# Ubuntu 24.04+), which Ubuntu 22.04 lacks. Compiling locally with the
-# image's gcc/g++ produces parsers linked against the available libstdc++,
-# placed under site/parser/ so Neovim's rtp finds them before the rocks copy.
-RUN rm -rf ${WORKINGDIR}/.local/share/nvim/lazy-rocks/tree-sitter-norg \
-           ${WORKINGDIR}/.local/share/nvim/lazy-rocks/tree-sitter-norg-meta && \
-    mkdir -p ${WORKINGDIR}/.local/share/nvim/site/parser && \
+# Ubuntu 24.04+), which Ubuntu 22.04 lacks. The plugin spec sets
+# `configure_parsers = false` so neorg ignores the cpath-resolved prebuilt
+# parser and uses the rtp; we compile from source into site/parser/ for that
+# rtp lookup.
+RUN mkdir -p ${WORKINGDIR}/.local/share/nvim/site/parser && \
     cd ${WORKINGDIR}/.local/share/nvim/lazy/tree-sitter-norg/src && \
     gcc -c -fPIC -O2 -I. parser.c   -o /tmp/norg-parser.o && \
     g++ -c -fPIC -O2 -I. scanner.cc -o /tmp/norg-scanner.o && \

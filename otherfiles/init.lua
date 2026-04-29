@@ -368,6 +368,15 @@ return {
 				load = {
 					["core.defaults"] = {},
 					["core.concealer"] = {},
+					-- Skip cpath-based parser loading; neorg's default uses
+					-- package.searchpath against package.cpath, which finds the
+					-- prebuilt rocks parser first. That .so requires GLIBCXX_3.4.32
+					-- (Ubuntu 24.04+) and fails to load on Ubuntu 22.04. Disabling
+					-- this forces neorg to use the runtimepath-resolved parser
+					-- compiled from source by the Dockerfile.
+					["core.integrations.treesitter"] = {
+						config = { configure_parsers = false },
+					},
 					["core.dirman"] = {
 						config = {
 							workspaces = {
