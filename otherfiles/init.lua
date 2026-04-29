@@ -319,6 +319,23 @@ return {
 		"MeanderingProgrammer/render-markdown.nvim",
 		ft = { "markdown", "codecompanion" },
 	},
+	-- Markdown preview in browser (:MarkdownPreview)
+	-- Running inside a docker container, so we don't try to launch a browser
+	-- from here; instead we expose the server and print the URL to paste into
+	-- the Windows browser. Make sure `docker run` publishes port 8080.
+	{
+		"iamcco/markdown-preview.nvim",
+		cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+		ft = { "markdown" },
+		build = "cd app && npm install",
+		init = function()
+			vim.g.mkdp_filetypes = { "markdown" }
+			vim.g.mkdp_auto_start = 0
+			vim.g.mkdp_open_to_the_world = 1
+			vim.g.mkdp_echo_preview_url = 1
+			vim.g.mkdp_browser = "true"
+		end,
+	},
 	{
 		"echasnovski/mini.diff",
 		config = function()
