@@ -375,6 +375,48 @@ return {
 		end,
 	},
 	{
+		"obsidian-nvim/obsidian.nvim",
+		version = "*",
+		lazy = true,
+		ft = "markdown",
+		cmd = "Obsidian",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"nvim-telescope/telescope.nvim",
+		},
+		opts = {
+			legacy_commands = false,
+			workspaces = {
+				{
+					name = "secondbrain",
+					path = "/vol/secondbrain",
+				},
+			},
+			daily_notes = {
+				folder = "daily",
+				date_format = "%Y-%m-%d",
+				template = "daily.md",
+			},
+			templates = {
+				folder = "templates",
+				date_format = "%Y-%m-%d",
+				time_format = "%H:%M",
+			},
+			picker = {
+				name = "telescope.nvim",
+			},
+			-- render-markdown.nvim already handles UI, avoid double-rendering
+			ui = { enable = false },
+			new_notes_location = "current_dir",
+			link = { style = "wiki" },
+			frontmatter = { enabled = true },
+			search = {
+				sort_by = "modified",
+				sort_reversed = true,
+			},
+		},
+	},
+	{
 		"coder/claudecode.nvim",
 		dependencies = { "folke/snacks.nvim" },
 		config = true,
