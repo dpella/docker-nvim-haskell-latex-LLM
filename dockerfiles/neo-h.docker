@@ -214,9 +214,18 @@ RUN \
   	tar xf lazygit.tar.gz lazygit && \ 
   	install lazygit /usr/local/bin && \
   	rm -f cmd lazygit lazygit.tar.gz version \
-  && \ 
+  && \
+    # Obsidian (desktop knowledge-management app, from latest GitHub release)
+    TAG=$(curl -fsSI https://github.com/obsidianmd/obsidian-releases/releases/latest | tr -d '\r' | grep -i '^location:' | rev | cut -d/ -f1 | rev) && \
+    VERSION=${TAG#v} && \
+    DEB_URL="https://github.com/obsidianmd/obsidian-releases/releases/download/${TAG}/obsidian_${VERSION}_amd64.deb" && \
+    printf 'Tag: %s\nVersion: %s\nURL: %s\n' "$TAG" "$VERSION" "$DEB_URL" && \
+    curl -fL --progress-bar "$DEB_URL" -o /tmp/obsidian.deb && \
+    apt-get update && apt-get install -y /tmp/obsidian.deb && \
+    rm /tmp/obsidian.deb && rm -rf /var/lib/apt/lists/* \
+  && \
     # Tmux plugins
-    git clone https://github.com/tmux-plugins/tpm ${WORKINGDIR}/.tmux/plugins/tpm 
+    git clone https://github.com/tmux-plugins/tpm ${WORKINGDIR}/.tmux/plugins/tpm
 
 ############################################## 
 # Powerline + Fuzzy Finder configuration
