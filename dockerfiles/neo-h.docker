@@ -195,6 +195,9 @@ RUN curl -LO https://github.com/neovim/neovim/releases/download/v0.11.0/${NVIM}.
 RUN tar -C /opt -xzf ${WORKINGDIR}/${NVIM}.tar.gz && rm ${WORKINGDIR}/${NVIM}.tar.gz
 RUN echo 'export PATH="$PATH:/opt/${NVIM}/bin"' >> ${WORKINGDIR}/.bashrc
 
+# pynvim — required by Coqtail and any other Python-based nvim plugin.
+RUN pip install --upgrade pynvim
+
 ################################
 ### Modern CLI tools ###########
 ################################
