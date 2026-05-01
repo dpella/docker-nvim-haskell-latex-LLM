@@ -97,9 +97,39 @@ RUN \
 	hoogle generate && rm -fr hoogle && cd ${WORKINGDIR}
 
 ################################
+### Coq + coq-lsp ##############
+################################
+FROM haskell AS coq
+
+# opam = Coq package manager. pkg-config is needed by zarith (a Coq dep).
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends opam pkg-config \
+  && rm -rf /var/lib/apt/lists/*
+
+# Initialise opam, create a switch with OCaml 4.14.2, then install
+# Coq 8.20.1 + coq-lsp 0.2.5 (the latest 8.x line, matched server/version).
+# --disable-sandboxing is required inside containers (no bwrap).
+ENV OPAM_SWITCH=cloudchor
+RUN opam init --bare --no-setup --disable-sandboxing --yes \
+  && opam switch create ${OPAM_SWITCH} 4.14.2 --yes \
+  && opam repo add coq-released https://coq.inria.fr/opam/released \
+       --switch ${OPAM_SWITCH} --yes \
+  && opam install --switch ${OPAM_SWITCH} --yes --assume-depexts \
+       coq.8.20.1 coq-lsp.0.2.5+8.20
+
+# Expose coqc/coqtop/coq-lsp on the default PATH so nvim's LSP client and
+# any non-login shell can find them without sourcing the opam env first.
+RUN ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqc     /usr/local/bin/coqc \
+  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqtop  /usr/local/bin/coqtop \
+  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coq-lsp /usr/local/bin/coq-lsp
+
+# Activate the switch in interactive shells (so `opam` itself works).
+RUN echo 'eval "$(opam env --switch=cloudchor 2>/dev/null)"' >> ${WORKINGDIR}/.bashrc
+
+################################
 ### MkDocs #####################
 ################################
-FROM haskell AS mkdocs
+FROM coq AS mkdocs
 
 RUN \
   pip install --upgrade Pygments && \
