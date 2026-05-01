@@ -117,11 +117,17 @@ RUN opam init --bare --no-setup --disable-sandboxing --yes \
   && opam install --switch ${OPAM_SWITCH} --yes --assume-depexts \
        coq.8.20.1 coq-lsp.0.2.5+8.20
 
-# Expose coqc/coqtop/coq-lsp on the default PATH so nvim's LSP client and
+# Expose the Coq toolchain on the default PATH so nvim's LSP client and
 # any non-login shell can find them without sourcing the opam env first.
-RUN ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqc     /usr/local/bin/coqc \
-  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqtop  /usr/local/bin/coqtop \
-  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coq-lsp /usr/local/bin/coq-lsp
+# coqdep and coq_makefile are needed for projects with a _CoqProject /
+# Makefile (the standard layout); coqc/coqtop/coq-lsp are the daily drivers.
+RUN ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqc         /usr/local/bin/coqc \
+  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqtop      /usr/local/bin/coqtop \
+  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coq-lsp     /usr/local/bin/coq-lsp \
+  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqdep      /usr/local/bin/coqdep \
+  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coq_makefile /usr/local/bin/coq_makefile \
+  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqdoc      /usr/local/bin/coqdoc \
+  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqchk      /usr/local/bin/coqchk
 
 # Activate the switch in interactive shells (so `opam` itself works).
 RUN echo 'eval "$(opam env --switch=cloudchor 2>/dev/null)"' >> ${WORKINGDIR}/.bashrc
