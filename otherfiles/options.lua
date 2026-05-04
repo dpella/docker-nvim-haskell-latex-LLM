@@ -2,6 +2,12 @@ require "nvchad.options"
 
 -- add yours here!
 
+-- NvChad disables the python3 provider by default; re-enable so Coqtail
+-- (and any other Python-based nvim plugin) can load. pynvim must be
+-- installed (see neo-h.docker).
+vim.g.loaded_python3_provider = nil
+vim.g.python3_host_prog = "/usr/bin/python3"
+
 local o = vim.o
 
 -- Bash as terminal

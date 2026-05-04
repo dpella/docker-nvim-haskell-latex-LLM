@@ -175,6 +175,32 @@ return {
 			vim.g.coqtail_nomap = 1
 			vim.g.coqtail_noimap = 1
 		end,
+		config = function()
+			-- Workaround for Coqtail's CoqtailJoinspaces augroup using a
+			-- non-bang `unlet b:_coqtail_save_js` on BufLeave, which errors
+			-- with E108 when BufEnter never set the var (e.g. switching tabs
+			-- in NvChad's tabufline). Replace it with an augroup using `unlet!`.
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = "coq",
+				callback = function(args)
+					pcall(vim.api.nvim_clear_autocmds,
+						{ group = "CoqtailJoinspaces", buffer = args.buf })
+					vim.cmd(string.format([[
+						augroup CoqtailJoinspacesFix
+						  autocmd! * <buffer=%d>
+						  autocmd BufEnter <buffer=%d>
+						        \ if !exists('b:_coqtail_save_js')
+						        \ |   let b:_coqtail_save_js = &js
+						        \ | endif
+						        \ | let &joinspaces = get(g:, 'coqtail_joinspaces', 0)
+						  autocmd BufLeave <buffer=%d>
+						        \ let &joinspaces = get(b:, '_coqtail_save_js', 1)
+						        \ | unlet! b:_coqtail_save_js
+						augroup END
+					]], args.buf, args.buf, args.buf))
+				end,
+			})
+		end,
 	},
 
 	-- Coq LSP client (server installed via opam in the `coq` Dockerfile stage)
