@@ -241,8 +241,7 @@ RUN \
     cd ${WORKINGDIR}/.fzf && ./install --all && cd ${WORKINGDIR} \
   && \
     # Zoxide (modern cd)
-    curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh -s -- --bin-dir=/usr/local/bin && \
-    echo 'eval "$(zoxide init bash)"' >> ${WORKINGDIR}/.bashrc \
+    curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh -s -- --bin-dir=/usr/local/bin \
   && \
     # Lazygit (visual aid for git)
     (curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*' > version) && \ 
@@ -406,6 +405,10 @@ RUN echo '' >> ${WORKINGDIR}/.bashrc && \
     echo 'if [ $((RANDOM % 100)) -lt 30 ]; then' >> ${WORKINGDIR}/.bashrc && \
     echo '    cd ${HOME}/.ansi-welcome && ./random-ansi.sh --cache && cd - > /dev/null' >> ${WORKINGDIR}/.bashrc && \
     echo 'fi' >> ${WORKINGDIR}/.bashrc
+
+# Zoxide must init AFTER starship — its PROMPT_COMMAND hook has to be
+# appended after starship sets the prompt, otherwise zoxide's doctor warns.
+RUN echo 'eval "$(zoxide init bash)"' >> ${WORKINGDIR}/.bashrc
 
 
 ENTRYPOINT [ "/bin/entrypoint" ]
