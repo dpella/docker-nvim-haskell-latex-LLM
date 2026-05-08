@@ -166,6 +166,55 @@ return {
 		lazy = false, -- This plugin is already lazy
 	},
 
+	-- Coq syntax + ftdetect (Coqtail used only for highlighting; the
+	-- interactive proof side is handled by coq-lsp.nvim below).
+	{
+		"whonore/Coqtail",
+		ft = "coq",
+		init = function()
+			vim.g.coqtail_nomap = 1
+			vim.g.coqtail_noimap = 1
+		end,
+		config = function()
+			-- Workaround for Coqtail's CoqtailJoinspaces augroup using a
+			-- non-bang `unlet b:_coqtail_save_js` on BufLeave, which errors
+			-- with E108 when BufEnter never set the var (e.g. switching tabs
+			-- in NvChad's tabufline). Replace it with an augroup using `unlet!`.
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = "coq",
+				callback = function(args)
+					pcall(vim.api.nvim_clear_autocmds,
+						{ group = "CoqtailJoinspaces", buffer = args.buf })
+					vim.cmd(string.format([[
+						augroup CoqtailJoinspacesFix
+						  autocmd! * <buffer=%d>
+						  autocmd BufEnter <buffer=%d>
+						        \ if !exists('b:_coqtail_save_js')
+						        \ |   let b:_coqtail_save_js = &js
+						        \ | endif
+						        \ | let &joinspaces = get(g:, 'coqtail_joinspaces', 0)
+						  autocmd BufLeave <buffer=%d>
+						        \ let &joinspaces = get(b:, '_coqtail_save_js', 1)
+						        \ | unlet! b:_coqtail_save_js
+						augroup END
+					]], args.buf, args.buf, args.buf))
+				end,
+			})
+		end,
+	},
+
+	-- Coq LSP client (server installed via opam in the `coq` Dockerfile stage)
+	{
+		"tomtomjhj/coq-lsp.nvim",
+		ft = "coq",
+		dependencies = { "neovim/nvim-lspconfig" },
+		config = function()
+			require("coq-lsp").setup({
+				coq_lsp_args = { "--bt" },
+			})
+		end,
+	},
+
 	-- Markdown (:Mtoc)
 	{
 		"hedyhli/markdown-toc.nvim",
@@ -319,6 +368,24 @@ return {
 		"MeanderingProgrammer/render-markdown.nvim",
 		ft = { "markdown", "codecompanion" },
 	},
+	-- Markdown preview in browser (:MarkdownPreview)
+	-- Running inside a docker container, so we don't try to launch a browser
+	-- from here; instead we expose the server and print the URL to paste into
+	-- the Windows browser. Make sure `docker run` publishes port 8080.
+	{
+		"iamcco/markdown-preview.nvim",
+		cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+		ft = { "markdown" },
+		build = "cd app && npm install",
+		init = function()
+			vim.g.mkdp_filetypes = { "markdown" }
+			vim.g.mkdp_auto_start = 0
+			vim.g.mkdp_open_to_the_world = 1
+			vim.g.mkdp_echo_preview_url = 1
+			vim.g.mkdp_browser = "true"
+			vim.g.mkdp_port = "8080"
+		end,
+	},
 	{
 		"echasnovski/mini.diff",
 		config = function()
@@ -355,6 +422,48 @@ return {
 				filetypes = { "log", "ansi", "ans" }, -- Filetypes to auto-enable
 			})
 		end,
+	},
+	{
+		"obsidian-nvim/obsidian.nvim",
+		version = "*",
+		lazy = true,
+		ft = "markdown",
+		cmd = "Obsidian",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"nvim-telescope/telescope.nvim",
+		},
+		opts = {
+			legacy_commands = false,
+			workspaces = {
+				{
+					name = "secondbrain",
+					path = "/vol/secondbrain",
+				},
+			},
+			daily_notes = {
+				folder = "daily",
+				date_format = "%Y-%m-%d",
+				template = "daily.md",
+			},
+			templates = {
+				folder = "templates",
+				date_format = "%Y-%m-%d",
+				time_format = "%H:%M",
+			},
+			picker = {
+				name = "telescope.nvim",
+			},
+			-- render-markdown.nvim already handles UI, avoid double-rendering
+			ui = { enable = false },
+			new_notes_location = "current_dir",
+			link = { style = "wiki" },
+			frontmatter = { enabled = true },
+			search = {
+				sort_by = "modified",
+				sort_reversed = true,
+			},
+		},
 	},
 	{
 		"coder/claudecode.nvim",

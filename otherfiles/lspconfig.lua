@@ -64,31 +64,37 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		--     opts.desc = "Restart LSP"
 		--     keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
 		--
-		-- Haskell
+	end,
+})
+
+-- Haskell-tools keymaps: use FileType haskell so they only apply to Haskell
+-- buffers and are set after haskell-tools has initialised the buffer.
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "haskell",
+	callback = function(event)
 		local ht = require("haskell-tools")
-		local bufnr = vim.api.nvim_get_current_buf()
+		local bufnr = event.buf
 		local opts = { noremap = true, silent = true, buffer = bufnr }
-		local opts1 = opts
 		-- haskell-language-server relies heavily on codeLenses,
 		-- so auto-refresh (see advanced configuration) is enabled by default
-		opts1.desc = "Run code in -- >>>"
-		vim.keymap.set("n", "<leader>rr", vim.lsp.codelens.run, opts1)
-		-- -- Hoogle search for the type signature of the definition under the cursor
-		opts1.desc = "Hoogle search"
-		vim.keymap.set("n", "<leader>ts", ht.hoogle.hoogle_signature, opts1)
+		opts.desc = "Run code in -- >>>"
+		vim.keymap.set("n", "<leader>rr", vim.lsp.codelens.run, opts)
+		-- Hoogle search for the type signature of the definition under the cursor
+		opts.desc = "Hoogle search"
+		vim.keymap.set("n", "<leader>ts", ht.hoogle.hoogle_signature, opts)
 		-- Evaluate all code snippets
-		opts1.desc = "Run all the code snippets in -- >>>"
-		vim.keymap.set("n", "<space>ra", ht.lsp.buf_eval_all, opts1)
+		opts.desc = "Run all the code snippets in -- >>>"
+		vim.keymap.set("n", "<leader>ra", ht.lsp.buf_eval_all, opts)
 		-- Toggle a GHCi repl for the current package
-		opts1.desc = "GHCi for the package"
-		vim.keymap.set("n", "<leader>rp", ht.repl.toggle, opts1)
+		opts.desc = "GHCi for the package"
+		vim.keymap.set("n", "<leader>rp", ht.repl.toggle, opts)
 		-- Toggle a GHCi repl for the current buffer
-		opts1.desc = "GHCi for the current file"
+		opts.desc = "GHCi for the current file"
 		vim.keymap.set("n", "<leader>rf", function()
 			ht.repl.toggle(vim.api.nvim_buf_get_name(0))
-		end, opts1)
-		opts1.desc = "GHCi quit"
-		vim.keymap.set("n", "<leader>rq", ht.repl.quit, opts1)
+		end, opts)
+		opts.desc = "GHCi quit"
+		vim.keymap.set("n", "<leader>rq", ht.repl.quit, opts)
 	end,
 })
 

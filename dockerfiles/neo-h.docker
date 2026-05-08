@@ -77,13 +77,13 @@ RUN \
 	  # Haskell
 	  (curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh) \
   && \
-    ghcup install ghc 9.6.7 && ghcup set ghc 9.6.7 \
+    ghcup install ghc 9.12.2 && ghcup set ghc 9.12.2 \
   && \
    # Cabal
-    ghcup install cabal 3.10.1.0 && ghcup set cabal 3.10.1.0 \
+    ghcup install cabal 3.16.0.0 && ghcup set cabal 3.16.0.0 \
   && \
    # Haskell HLS
-    ghcup install hls 2.10.0.0 && ghcup set hls 2.10.0.0 \
+    ghcup install hls 2.13.0.0 && ghcup set hls 2.13.0.0 \
   && \
     # Haskell fast tags
     cabal install fast-tags
@@ -97,9 +97,45 @@ RUN \
 	hoogle generate && rm -fr hoogle && cd ${WORKINGDIR}
 
 ################################
+### Coq + coq-lsp ##############
+################################
+FROM haskell AS coq
+
+# opam = Coq package manager. pkg-config is needed by zarith (a Coq dep).
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends opam pkg-config \
+  && rm -rf /var/lib/apt/lists/*
+
+# Initialise opam, create a switch with OCaml 4.14.2, then install
+# Coq 8.20.1 + coq-lsp 0.2.5 (the latest 8.x line, matched server/version).
+# --disable-sandboxing is required inside containers (no bwrap).
+ENV OPAM_SWITCH=cloudchor
+RUN opam init --bare --no-setup --disable-sandboxing --yes \
+  && opam switch create ${OPAM_SWITCH} 4.14.2 --yes \
+  && opam repo add coq-released https://coq.inria.fr/opam/released \
+       --switch ${OPAM_SWITCH} --yes \
+  && opam install --switch ${OPAM_SWITCH} --yes --assume-depexts \
+       coq.8.20.1 coq-lsp.0.2.5+8.20
+
+# Expose the Coq toolchain on the default PATH so nvim's LSP client and
+# any non-login shell can find them without sourcing the opam env first.
+# coqdep and coq_makefile are needed for projects with a _CoqProject /
+# Makefile (the standard layout); coqc/coqtop/coq-lsp are the daily drivers.
+RUN ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqc         /usr/local/bin/coqc \
+  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqtop      /usr/local/bin/coqtop \
+  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coq-lsp     /usr/local/bin/coq-lsp \
+  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqdep      /usr/local/bin/coqdep \
+  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coq_makefile /usr/local/bin/coq_makefile \
+  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqdoc      /usr/local/bin/coqdoc \
+  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqchk      /usr/local/bin/coqchk
+
+# Activate the switch in interactive shells (so `opam` itself works).
+RUN echo 'eval "$(opam env --switch=cloudchor 2>/dev/null)"' >> ${WORKINGDIR}/.bashrc
+
+################################
 ### MkDocs #####################
 ################################
-FROM haskell AS mkdocs
+FROM coq AS mkdocs
 
 RUN \
   pip install --upgrade Pygments && \
@@ -165,6 +201,9 @@ RUN curl -LO https://github.com/neovim/neovim/releases/download/v0.11.0/${NVIM}.
 RUN tar -C /opt -xzf ${WORKINGDIR}/${NVIM}.tar.gz && rm ${WORKINGDIR}/${NVIM}.tar.gz
 RUN echo 'export PATH="$PATH:/opt/${NVIM}/bin"' >> ${WORKINGDIR}/.bashrc
 
+# pynvim — required by Coqtail and any other Python-based nvim plugin.
+RUN pip install --upgrade pynvim
+
 ################################
 ### Modern CLI tools ###########
 ################################
@@ -214,9 +253,18 @@ RUN \
   	tar xf lazygit.tar.gz lazygit && \ 
   	install lazygit /usr/local/bin && \
   	rm -f cmd lazygit lazygit.tar.gz version \
-  && \ 
+  && \
+    # Obsidian (desktop knowledge-management app, from latest GitHub release)
+    TAG=$(curl -fsSI https://github.com/obsidianmd/obsidian-releases/releases/latest | tr -d '\r' | grep -i '^location:' | rev | cut -d/ -f1 | rev) && \
+    VERSION=${TAG#v} && \
+    DEB_URL="https://github.com/obsidianmd/obsidian-releases/releases/download/${TAG}/obsidian_${VERSION}_amd64.deb" && \
+    printf 'Tag: %s\nVersion: %s\nURL: %s\n' "$TAG" "$VERSION" "$DEB_URL" && \
+    curl -fL --progress-bar "$DEB_URL" -o /tmp/obsidian.deb && \
+    apt-get update && apt-get install -y /tmp/obsidian.deb && \
+    rm /tmp/obsidian.deb && rm -rf /var/lib/apt/lists/* \
+  && \
     # Tmux plugins
-    git clone https://github.com/tmux-plugins/tpm ${WORKINGDIR}/.tmux/plugins/tpm 
+    git clone https://github.com/tmux-plugins/tpm ${WORKINGDIR}/.tmux/plugins/tpm
 
 ##############################################
 # Starship prompt + Fuzzy Finder configuration
@@ -261,6 +309,7 @@ RUN chmod +x /bin/entrypoint
 # Configuration of plugins
 RUN tmux start-server && \
     tmux new-session -d && \
+    tmux source-file ${WORKINGDIR}/.tmux.conf && \
     sleep 1 && \
     ~/.tmux/plugins/tpm/scripts/install_plugins.sh && \
     tmux kill-server
@@ -334,7 +383,7 @@ RUN \
     # Treesitter parsers (yaml required by codecompanion prompt library)
     /opt/${NVIM}/bin/nvim --headless +"TSInstall yaml" +q
 
-# File format options for Haskell code 
+# File format options for Haskell code
 COPY ./otherfiles/fourmolu.yaml  ${WORKINGDIR}
 RUN mv ${WORKINGDIR}/fourmolu.yaml ${WORKINGDIR}/.local/share/nvim/mason/bin/
 
@@ -353,8 +402,10 @@ RUN npm install -g @anthropic-ai/claude-code
 RUN git clone https://github.com/alejandrorusso/ansi-welcome.git ${WORKINGDIR}/.ansi-welcome && \
     chmod +x ${WORKINGDIR}/.ansi-welcome/random-ansi.sh
 RUN echo '' >> ${WORKINGDIR}/.bashrc && \
-    echo '# Display random ANSI welcome message' >> ${WORKINGDIR}/.bashrc && \
-    echo 'cd ${HOME}/.ansi-welcome && ./random-ansi.sh && cd - > /dev/null' >> ${WORKINGDIR}/.bashrc
+    echo '# Display random ANSI welcome message (30% of the time)' >> ${WORKINGDIR}/.bashrc && \
+    echo 'if [ $((RANDOM % 100)) -lt 30 ]; then' >> ${WORKINGDIR}/.bashrc && \
+    echo '    cd ${HOME}/.ansi-welcome && ./random-ansi.sh --cache && cd - > /dev/null' >> ${WORKINGDIR}/.bashrc && \
+    echo 'fi' >> ${WORKINGDIR}/.bashrc
 
 
 ENTRYPOINT [ "/bin/entrypoint" ]
