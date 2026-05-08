@@ -24,8 +24,8 @@ RUN apt-get update \
 	  # Development tools 
     libnuma-dev zlib1g-dev libgmp-dev libgmp10 liblzma-dev gcc \
 	  autoconf automake gpg dirmngr build-essential lsb-release gnupg2 socat \ 
-	  # Shell  
-	  powerline less \
+	  # Shell
+	  less \
 	  # Neovim utilities 
 	  trash-cli tldr bat coreutils unzip locales npm ripgrep dbus-x11 openjdk-11-jdk \
 	  fd-find luarocks \
@@ -218,20 +218,28 @@ RUN \
     # Tmux plugins
     git clone https://github.com/tmux-plugins/tpm ${WORKINGDIR}/.tmux/plugins/tpm 
 
-############################################## 
-# Powerline + Fuzzy Finder configuration
-############################################## 
-# Copy activation lines for powerfile 
-COPY ./otherfiles/powerline ${WORKINGDIR}
-# Two lines  
-COPY ./otherfiles/default.twolines.json ${WORKINGDIR}
-# Activate powerline 
-RUN \ 
-	cat ${WORKINGDIR}/powerline >> ${WORKINGDIR}/.bashrc && rm  ${WORKINGDIR}/powerline  
-# Activate two lines powerline 
-RUN mv ${WORKINGDIR}/default.twolines.json /usr/share/powerline/config_files/themes/shell
-RUN sed -i 's/default_leftonly/default.twolines/g' /usr/share/powerline/config_files/config.json
-RUN echo "alias less='batcat -p'" >> ${WORKINGDIR}/.bashrc 
+##############################################
+# Starship prompt + Fuzzy Finder configuration
+##############################################
+ARG STARSHIP_VERSION=1.21.1
+RUN ARCH="$(uname -m)" && \
+    case "$ARCH" in \
+      x86_64)  TARGET="x86_64-unknown-linux-gnu" ;; \
+      aarch64) TARGET="aarch64-unknown-linux-gnu" ;; \
+      *) echo "Unsupported arch: $ARCH" && exit 1 ;; \
+    esac && \
+    curl -fsSL "https://github.com/starship/starship/releases/download/v${STARSHIP_VERSION}/starship-${TARGET}.tar.gz" \
+      | tar -xz -C /tmp && \
+    install -m 0755 /tmp/starship /usr/local/bin/starship && \
+    rm -f /tmp/starship
+
+# Starship config
+RUN mkdir -p ${WORKINGDIR}/.config
+COPY ./otherfiles/starship.toml ${WORKINGDIR}/.config/starship.toml
+
+# Wire starship into .bashrc
+RUN echo 'eval "$(starship init bash)"' >> ${WORKINGDIR}/.bashrc
+RUN echo "alias less='batcat -p'" >> ${WORKINGDIR}/.bashrc
 # Fuzzy find filer
 COPY ./otherfiles/fzf ${WORKINGDIR}
 RUN cat ${WORKINGDIR}/fzf >> ${WORKINGDIR}/.bashrc && rm ${WORKINGDIR}/fzf 
