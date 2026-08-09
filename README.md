@@ -43,6 +43,10 @@ Support for ANSI files (`:AnsiEnable` and `:AnsiDisable`)
     - Manage repositories and commits (Lazygit, `<leader>gg`)
     - Auto-indentation when saving files (`*.hs`, `*.tex`, `*.lua`)
     - Dictionary and writting suggestion by ltex 
+    - Paper-review / prose mode (`<leader>tw`, or `:ReviewMode`): soft-wraps the text at 80
+      columns without inserting hard line breaks, so yanking a paragraph gives one unbroken
+      line to paste into a browser (dictionary, grammar checker, ...). While on, `j`/`k`/`0`/`$`
+      move by screen line
 
 ## Editing tips
     - `Ctrl+w` for all windows related things (resize, swap, etc.)
