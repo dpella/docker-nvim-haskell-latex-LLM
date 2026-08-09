@@ -1,0 +1,99 @@
+# Starship config — powerline two-line look with arrowed segments.
+
+format = """
+$os\
+$username\
+[](bg:#0087af fg:#005f87)\
+${custom.host}\
+[](bg:#3a3a3a fg:#0087af)\
+$directory\
+[](bg:#1c1c1c fg:#3a3a3a)\
+$git_branch\
+$git_status\
+[](fg:#1c1c1c)\
+$fill\
+$cmd_duration\
+$status\
+$jobs
+$character"""
+
+add_newline = true
+
+[fill]
+symbol = " "
+
+# λ on the second line wrapped in its own arrowed segment.
+[character]
+success_symbol = "[ λ ](bg:#005f87 fg:#ffffff bold)[](fg:#005f87)"
+error_symbol   = "[ λ ](bg:#870000 fg:#ffffff bold)[](fg:#870000)"
+vimcmd_symbol  = "[ λ ](bg:#5f5f00 fg:#ffffff bold)[](fg:#5f5f00)"
+
+[username]
+show_always = true
+style_user = "bg:#005f87 fg:#ffffff bold"
+style_root = "bg:#005f87 fg:#ffffff bold"
+format = "[ $user ]($style)"
+
+[hostname]
+disabled = true
+
+[custom.host]
+description = "First 4 chars of hostname (Docker container short id)"
+command = "hostname | cut -c1-4"
+when = "true"
+shell = ["bash", "--noprofile", "--norc"]
+style = "bg:#0087af fg:#ffffff"
+format = "[ $output ]($style)"
+
+[directory]
+style = "bg:#3a3a3a fg:#ffffff"
+format = "[ $path ]($style)"
+truncation_length = 4
+truncate_to_repo = false
+
+[git_branch]
+symbol = ""
+style = "bg:#1c1c1c fg:#5fafff"
+format = "[ $symbol $branch ]($style)"
+
+[git_status]
+style = "bg:#1c1c1c fg:#ff8700"
+format = '[$all_status$ahead_behind ]($style)'
+stashed = '\$${count} '
+ahead = "↑${count} "
+behind = "↓${count} "
+diverged = "↕↑${ahead_count}↓${behind_count} "
+modified = "✱${count} "
+staged = "●${count} "
+untracked = "?${count} "
+conflicted = "✖${count} "
+
+[cmd_duration]
+min_time = 500
+style = "fg:#ffaf00"
+format = "[ took $duration ]($style)"
+
+[status]
+disabled = false
+style = "fg:#ff5f5f"
+symbol = "✖ "
+format = '[$symbol$status]($style) '
+
+[jobs]
+style = "fg:#5fafff"
+symbol = "✦"
+format = "[$symbol$number]($style) "
+
+# Disable heavy modules for snappy startup.
+[nodejs]
+disabled = true
+[python]
+disabled = true
+[package]
+disabled = true
+[aws]
+disabled = true
+[gcloud]
+disabled = true
+[docker_context]
+disabled = true

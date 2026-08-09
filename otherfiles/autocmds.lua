@@ -1,5 +1,15 @@
 local autocmd = vim.api.nvim_create_autocmd
 
+-- Auto-reload files changed outside nvim (pairs with autoread = true)
+autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+  pattern = "*",
+  callback = function()
+    if vim.fn.mode() ~= "c" then
+      vim.cmd "checktime"
+    end
+  end,
+})
+
 -- Set filetype for .ansi files
 autocmd({ "BufRead", "BufNewFile" }, {
   pattern = "*.ansi",
