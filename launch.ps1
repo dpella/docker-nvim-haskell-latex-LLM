@@ -168,12 +168,22 @@ if ($isWSL) {
     $displayVar = "host.docker.internal:0.0"
 }
 
+# Assign half of the host CPUs to the container
+$totalCpus = [Environment]::ProcessorCount
+$containerCpus = [Math]::Max(1, [Math]::Floor($totalCpus / 2))
+# Docker rejects --cpus above what its engine sees (Docker Desktop's VM may have fewer)
+$dockerCpus = docker info --format "{{.NCPU}}" 2>$null
+if ($dockerCpus -match '^\d+$' -and [int]$dockerCpus -gt 0) {
+    $containerCpus = [Math]::Min($containerCpus, [int]$dockerCpus)
+}
+Write-Host "Detected $totalCpus CPUs - assigning $containerCpus to the container"
+
 # Build docker run command
 $dockerArgs = @(
     "run",
     "--rm",
     "-d",
-    "--cpus=8",
+    "--cpus=$containerCpus",
     "-it",
     "-v", "${dockerPath}/ssh:/tmp/ssh:ro",
     "-v", "${IMAGE}:/vol"

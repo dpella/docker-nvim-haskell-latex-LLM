@@ -57,9 +57,20 @@ if [ "${IMAGE}" = "neo-h" ]; then
     PORT_OPTION="-p 0.0.0.0:8000:8000 -p 0.0.0.0:2222:2222 -p 0.0.0.0:8080:8080"
 fi
 
+# Assign half of the host CPUs to the container
+TOTAL_CPUS=$(nproc 2>/dev/null || getconf _NPROCESSORS_ONLN)
+CONTAINER_CPUS=$(( TOTAL_CPUS / 2 ))
+[ "${CONTAINER_CPUS}" -lt 1 ] && CONTAINER_CPUS=1
+# Docker rejects --cpus above what its engine sees (e.g. Docker Desktop's VM)
+DOCKER_CPUS=$(docker info --format '{{.NCPU}}' 2>/dev/null)
+if [ -n "${DOCKER_CPUS}" ] && [ "${DOCKER_CPUS}" -gt 0 ] 2>/dev/null && [ "${CONTAINER_CPUS}" -gt "${DOCKER_CPUS}" ]; then
+	CONTAINER_CPUS=${DOCKER_CPUS}
+fi
+echo "Detected ${TOTAL_CPUS} CPUs - assigning ${CONTAINER_CPUS} to the container"
+
 docker run --rm \
 	   -d   \
-	   --cpus="8" \
+	   --cpus="${CONTAINER_CPUS}" \
            -it  \
 	   -v $(pwd)/ssh:/tmp/ssh:ro \
 	   -v ${IMAGE}:/vol  \
