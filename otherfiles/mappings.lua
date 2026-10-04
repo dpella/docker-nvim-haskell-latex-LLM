@@ -103,12 +103,13 @@ map(
 -- signs are hidden so the text column is exactly REVIEW_WIDTH characters.
 local REVIEW_WIDTH = 80
 
-local review = { on = false, saved = nil }
+local review = { on = false, saved = nil, buf = nil }
 
 local function review_apply()
   local o = vim.o
-  o.textwidth = 0
-  o.wrapmargin = 0
+  -- Buffer-local, so restoring them later doesn't leak into the global default
+  vim.bo.textwidth = 0
+  vim.bo.wrapmargin = 0
   o.wrap = true
   o.linebreak = true -- break by word rather than mid-character
   o.breakindent = true
@@ -123,9 +124,11 @@ local function review_toggle()
   local o = vim.o
 
   if not review.on then
+    review.buf = {
+      textwidth = vim.bo.textwidth,
+      wrapmargin = vim.bo.wrapmargin,
+    }
     review.saved = {
-      textwidth = o.textwidth,
-      wrapmargin = o.wrapmargin,
       wrap = o.wrap,
       linebreak = o.linebreak,
       breakindent = o.breakindent,
@@ -149,6 +152,10 @@ local function review_toggle()
       o[opt] = val
     end
     review.saved = nil
+    for opt, val in pairs(review.buf or {}) do
+      vim.bo[opt] = val
+    end
+    review.buf = nil
 
     for _, lhs in ipairs { "j", "k", "0", "$" } do
       pcall(vim.keymap.del, { "n", "x" }, lhs)

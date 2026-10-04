@@ -18,12 +18,16 @@ autocmd({ "BufRead", "BufNewFile" }, {
   end,
 })
 
+-- Prose files: hard wrap at 80 while typing; review mode (<leader>tw, see
+-- mappings.lua) switches to soft wrap and restores this when toggled off
 autocmd("FileType", {
-  pattern = "markdown",
+  pattern = { "markdown", "text" },
   callback = function()
     vim.opt_local.textwidth = 80
+    vim.opt_local.wrapmargin = 0
     vim.opt_local.colorcolumn = "80"
     vim.opt_local.wrap = true
     vim.opt_local.linebreak = true
+    vim.opt_local.breakindent = true
   end,
 })
