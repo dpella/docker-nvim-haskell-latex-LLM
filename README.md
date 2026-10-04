@@ -43,10 +43,13 @@ Support for ANSI files (`:AnsiEnable` and `:AnsiDisable`)
     - Manage repositories and commits (Lazygit, `<leader>gg`)
     - Auto-indentation when saving files (`*.hs`, `*.tex`, `*.lua`)
     - Dictionary and writting suggestion by ltex 
-    - Paper-review / prose mode (`<leader>tw`, or `:ReviewMode`): soft-wraps the text at 80
-      columns without inserting hard line breaks, so yanking a paragraph gives one unbroken
-      line to paste into a browser (dictionary, grammar checker, ...). While on, `j`/`k`/`0`/`$`
-      move by screen line
+    - Markdown and `.txt` files hard-wrap at 80 columns while typing (`textwidth=80`)
+    - Paper-review / prose mode (`<leader>tw`, or `:ReviewMode`; run it again to turn it off):
+      soft-wraps the text at 80 columns without inserting hard line breaks, so yanking a
+      paragraph gives one unbroken line to paste into a browser (dictionary, grammar
+      checker, ...). It sets the current buffer's `textwidth` to 0 and restores it (80 for
+      `.md`/`.txt`) when toggled off. While on, nvim shrinks to 80 columns, line numbers are
+      hidden, and `j`/`k`/`0`/`$` move by screen line
 
 ## Editing tips
     - `Ctrl+w` for all windows related things (resize, swap, etc.)
