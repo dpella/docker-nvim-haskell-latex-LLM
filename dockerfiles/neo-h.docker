@@ -392,6 +392,9 @@ RUN \
 COPY ./otherfiles/fourmolu.yaml  ${WORKINGDIR}
 RUN mv ${WORKINGDIR}/fourmolu.yaml ${WORKINGDIR}/.local/share/nvim/mason/bin/
 
+# Expose Mason-managed binaries (e.g. fourmolu) to the CLI / PATH, not just nvim
+ENV PATH="${WORKINGDIR}/.local/share/nvim/mason/bin:$PATH"
+
 # CodeCompanion (AI assistant) in NVIM 
 RUN echo 'export XDG_RUNTIME_DIR=/tmp' >> ${WORKINGDIR}/.bashrc
 
