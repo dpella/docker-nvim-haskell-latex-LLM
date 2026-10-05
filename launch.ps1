@@ -26,6 +26,10 @@ if ($IMAGE -notin $IMAGES) {
     Show-Images
 }
 
+# neo-h-us shares neo-h's single /vol volume (same workspace, different user).
+$VOLUME = $IMAGE
+if ($IMAGE -eq "neo-h-us") { $VOLUME = "neo-h" }
+
 # Checking if the image exists
 $imageExists = docker images --format "{{.Repository}}" | Select-String -Pattern "^${IMAGE}$" -Quiet
 
@@ -61,13 +65,13 @@ if ($imageExists) {
 }
 
 # Checking if an associated volume exists
-$volumeExists = docker volume ls --format "{{.Name}}" | Select-String -Pattern "^${IMAGE}$" -Quiet
+$volumeExists = docker volume ls --format "{{.Name}}" | Select-String -Pattern "^${VOLUME}$" -Quiet
 
 if ($volumeExists) {
     Write-Host "Volume already exists"
 } else {
     Write-Host "Creating volume!"
-    docker volume create $IMAGE
+    docker volume create $VOLUME
 }
 
 Write-Host "Launching the container..."
@@ -75,8 +79,8 @@ Write-Host "Launching the container..."
 # Display Windows Explorer path to access the Docker volume
 # Try different path formats for compatibility
 $volumePaths = @(
-    "\\wsl$\docker-desktop-data\data\docker\volumes\${IMAGE}\_data",
-    "\\wsl$\docker-desktop-data\version-pack-data\community\docker\volumes\${IMAGE}\_data"
+    "\\wsl$\docker-desktop-data\data\docker\volumes\${VOLUME}\_data",
+    "\\wsl$\docker-desktop-data\version-pack-data\community\docker\volumes\${VOLUME}\_data"
 )
 
 $volumePath = $null
@@ -103,8 +107,8 @@ if ($volumePath) {
     Write-Host "To access the Docker volume in Windows Explorer:"
     Write-Host "1. Open File Explorer"
     Write-Host "2. Type in address bar: \\wsl$\"
-    Write-Host "3. Navigate to: docker-desktop-data\data\docker\volumes\${IMAGE}\_data"
-    Write-Host "   (or try: docker-desktop-data\version-pack-data\community\docker\volumes\${IMAGE}\_data)"
+    Write-Host "3. Navigate to: docker-desktop-data\data\docker\volumes\${VOLUME}\_data"
+    Write-Host "   (or try: docker-desktop-data\version-pack-data\community\docker\volumes\${VOLUME}\_data)"
     Write-Host "========================================"
     Write-Host ""
 }
@@ -207,7 +211,7 @@ $dockerArgs = @(
     "--cpus=$containerCpus",
     "-it",
     "-v", "${dockerPath}/ssh:/tmp/ssh:ro",
-    "-v", "${IMAGE}:/vol"
+    "-v", "${VOLUME}:/vol"
 )
 
 # Add X11 volumes if in WSL

@@ -5,6 +5,12 @@
 IMAGE=$1 
 IMAGES=$(find dockerfiles/ -name "*.docker"  -printf "%f\n" | awk -F. '{ print $1 }')
 
+# neo-h-us shares neo-h's single /vol volume (same workspace, different user).
+VOLUME=${IMAGE}
+if [ "${IMAGE}" = "neo-h-us" ]; then
+	VOLUME=neo-h
+fi
+
 show_images() {
 	echo "Available images are:" $IMAGES
 	exit 1
@@ -56,13 +62,13 @@ else
 fi 
 
 # Checking if an associated volume exists 
-docker volume ls | grep ${IMAGE} 
+docker volume ls | grep ${VOLUME} 
 
 if [ $? -eq 0 ]; then 
 	echo "Volume already exists" 
 else
 	echo "Creating volume!"
-	docker volume create ${IMAGE} 
+	docker volume create ${VOLUME}
 fi 
 
 echo "Launching the container..."
@@ -90,7 +96,7 @@ docker run --rm \
 	   --cpus="${CONTAINER_CPUS}" \
            -it  \
 	   -v $(pwd)/ssh:/tmp/ssh:ro \
-	   -v ${IMAGE}:/vol  \
+	   -v ${VOLUME}:/vol  \
            -v /tmp/.X11-unix:/tmp/.X11-unix \
            -v /mnt/wslg:/mnt/wslg \
 	   -v /var/run/docker.sock:/var/run/docker.sock \
