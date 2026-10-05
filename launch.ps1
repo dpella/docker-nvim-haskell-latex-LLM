@@ -36,7 +36,28 @@ if ($imageExists) {
     & "$PSScriptRoot/fix-line-endings.ps1"
 
     Write-Host "Building the image..."
-    docker build -f "./dockerfiles/${IMAGE}.docker" . --tag "${IMAGE}:devel"
+    if (Select-String -Path "./dockerfiles/${IMAGE}.docker" -Pattern "id=root_pw" -Quiet) {
+        # This image sets the root password from a build secret -- ask for it now.
+        while ($true) {
+            $rp1 = Read-Host -AsSecureString "Root password for the image"
+            $rp2 = Read-Host -AsSecureString "Confirm root password"
+            $p1 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($rp1))
+            $p2 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($rp2))
+            if ($p1 -eq $p2) { break }
+            Write-Host "Passwords do not match, try again."
+        }
+        $rootPwFile = New-TemporaryFile
+        try {
+            [System.IO.File]::WriteAllText($rootPwFile.FullName, $p1)
+            $env:DOCKER_BUILDKIT = "1"
+            docker build -f "./dockerfiles/${IMAGE}.docker" . --secret "id=root_pw,src=$($rootPwFile.FullName)" --tag "${IMAGE}:devel"
+        } finally {
+            Remove-Item -Force $rootPwFile.FullName
+            $p1 = $null; $p2 = $null
+        }
+    } else {
+        docker build -f "./dockerfiles/${IMAGE}.docker" . --tag "${IMAGE}:devel"
+    }
 }
 
 # Checking if an associated volume exists

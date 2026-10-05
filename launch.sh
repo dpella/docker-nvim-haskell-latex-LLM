@@ -35,7 +35,24 @@ if [ $? -eq 0 ]; then
 	echo "Image already exists!"
 else
 	echo "Building the image..."
-	docker build -f ./dockerfiles/${IMAGE}.docker . --tag ${IMAGE}:devel
+	if grep -q 'id=root_pw' "./dockerfiles/${IMAGE}.docker"; then
+		# This image sets the root password from a build secret -- ask for it now.
+		ROOT_PW_FILE=$(mktemp)
+		trap 'rm -f "${ROOT_PW_FILE}"' EXIT
+		while :; do
+			read -r -s -p "Root password for the image: " RP1; echo
+			read -r -s -p "Confirm root password:       " RP2; echo
+			[ "${RP1}" = "${RP2}" ] && break
+			echo "Passwords do not match, try again."
+		done
+		printf '%s' "${RP1}" > "${ROOT_PW_FILE}"
+		unset RP1 RP2
+		DOCKER_BUILDKIT=1 docker build -f ./dockerfiles/${IMAGE}.docker . \
+			--secret id=root_pw,src="${ROOT_PW_FILE}" --tag ${IMAGE}:devel
+		rm -f "${ROOT_PW_FILE}"; trap - EXIT
+	else
+		docker build -f ./dockerfiles/${IMAGE}.docker . --tag ${IMAGE}:devel
+	fi
 fi 
 
 # Checking if an associated volume exists 
