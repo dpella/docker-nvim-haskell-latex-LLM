@@ -85,8 +85,10 @@ RUN \
    # Haskell HLS
     ghcup install hls 2.13.0.0 && ghcup set hls 2.13.0.0 \
   && \
-    # Haskell fast tags
-    cabal install fast-tags
+    # Haskell dev tools: fast-tags, ghcid (auto-reload GHCi), hlint, cabal-plan
+    # (build plan + dependency graph), cabal-gild (.cabal formatter), hsec-tools
+    # (official HSEC security-advisory DB tooling)
+    cabal install fast-tags ghcid hlint cabal-plan cabal-gild hsec-tools hsec-sync
 
 # Hoogle
 # The way to do it should be like this: RUN cabal install hoogle
@@ -95,6 +97,12 @@ RUN \
 RUN \
 	git clone https://github.com/ndmitchell/hoogle.git && cd hoogle && cabal install && \
 	hoogle generate && rm -fr hoogle && cd ${WORKINGDIR}
+
+# cabal-audit (dependency vuln scanner vs the HSEC DB) — not on Hackage, so
+# install from the git repo (like hoogle above). Pin a commit for reproducibility.
+RUN \
+	git clone https://github.com/MangoIV/cabal-audit.git && cd cabal-audit && \
+	cabal install && cd ${WORKINGDIR} && rm -rf cabal-audit
 
 ################################
 ### Coq + coq-lsp ##############
