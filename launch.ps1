@@ -26,9 +26,7 @@ if ($IMAGE -notin $IMAGES) {
     Show-Images
 }
 
-# neo-h-us shares neo-h's single /vol volume (same workspace, different user).
 $VOLUME = $IMAGE
-if ($IMAGE -eq "neo-h-us") { $VOLUME = "neo-h" }
 
 # Checking if the image exists
 $imageExists = docker images --format "{{.Repository}}" | Select-String -Pattern "^${IMAGE}$" -Quiet

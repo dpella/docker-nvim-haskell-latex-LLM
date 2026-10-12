@@ -5,11 +5,7 @@
 IMAGE=$1 
 IMAGES=$(find dockerfiles/ -name "*.docker"  -printf "%f\n" | awk -F. '{ print $1 }')
 
-# neo-h-us shares neo-h's single /vol volume (same workspace, different user).
 VOLUME=${IMAGE}
-if [ "${IMAGE}" = "neo-h-us" ]; then
-	VOLUME=neo-h
-fi
 
 show_images() {
 	echo "Available images are:" $IMAGES

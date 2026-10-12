@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 ################################
 ### Base image #################
 ################################
@@ -10,8 +11,20 @@ LABEL description="GHC for development"
 
 # Set the timezone so apt-get doesn't ask for it later
 ENV TZ=Europe/Stockholm
-ENV WORKINGDIR=/root
+
+# Unprivileged user this image runs as (override: --build-arg USERNAME=...).
+ARG USERNAME=dev
+ARG USER_UID=1000
+ARG USER_GID=1000
+# Everything installs into the user's home (HOME points here); the whole tree
+# is handed to the user at the end of the build.
+ENV WORKINGDIR=/home/${USERNAME}
+ENV HOME=${WORKINGDIR}
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Create the unprivileged user + home BEFORE anything writes into it.
+RUN groupadd --gid ${USER_GID} ${USERNAME} \
+  && useradd --uid ${USER_UID} --gid ${USER_GID} --create-home --shell /bin/bash ${USERNAME}
 
 WORKDIR ${WORKINGDIR}
 
@@ -57,12 +70,31 @@ RUN apt-get update \
 RUN locale-gen en_US.UTF-8 && update-locale
 ENV LANG=en_US.UTF-8
 
+# Privilege model: dev is unprivileged but has sudo; sudo REQUIRES a password,
+# and `Defaults rootpw` makes it prompt for the ROOT password (dev itself stays
+# passwordless). Escalate with `sudo ...` and the root password.
+RUN usermod -aG sudo ${USERNAME} \
+  && echo 'Defaults rootpw' > /etc/sudoers.d/00-rootpw \
+  && chmod 0440 /etc/sudoers.d/00-rootpw
+
+# Set the root password from a BuildKit secret so it is never baked into an
+# image layer or `docker history`. Create a local (gitignored) file and build:
+#   DOCKER_BUILDKIT=1 docker build --secret id=root_pw,src=ssh/root_pw \
+#     -f dockerfiles/neo-h.docker -t neo-h:devel .
+# Omit the secret and root is simply left without a password.
+RUN --mount=type=secret,id=root_pw \
+    if [ -s /run/secrets/root_pw ]; then \
+      echo "root:$(cat /run/secrets/root_pw)" | chpasswd; \
+    else \
+      echo "WARNING: no root_pw secret provided; root password left unset"; \
+    fi
+
 # VIM motions in bash 
 RUN echo "set -o vi" >> ${WORKINGDIR}/.bashrc
 
 # Loading key for github, etc.
 RUN echo 'eval $(ssh-agent)' >> ${WORKINGDIR}/.bashrc
-RUN echo '/usr/bin/ssh-add /root/.ssh/key' >> ${WORKINGDIR}/.bashrc 
+RUN echo "/usr/bin/ssh-add ${WORKINGDIR}/.ssh/key" >> ${WORKINGDIR}/.bashrc 
 
 ################################
 ### Haskell ####################
@@ -129,13 +161,13 @@ RUN opam init --bare --no-setup --disable-sandboxing --yes \
 # any non-login shell can find them without sourcing the opam env first.
 # coqdep and coq_makefile are needed for projects with a _CoqProject /
 # Makefile (the standard layout); coqc/coqtop/coq-lsp are the daily drivers.
-RUN ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqc         /usr/local/bin/coqc \
-  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqtop      /usr/local/bin/coqtop \
-  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coq-lsp     /usr/local/bin/coq-lsp \
-  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqdep      /usr/local/bin/coqdep \
-  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coq_makefile /usr/local/bin/coq_makefile \
-  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqdoc      /usr/local/bin/coqdoc \
-  && ln -sf /root/.opam/${OPAM_SWITCH}/bin/coqchk      /usr/local/bin/coqchk
+RUN ln -sf ${WORKINGDIR}/.opam/${OPAM_SWITCH}/bin/coqc         /usr/local/bin/coqc \
+  && ln -sf ${WORKINGDIR}/.opam/${OPAM_SWITCH}/bin/coqtop      /usr/local/bin/coqtop \
+  && ln -sf ${WORKINGDIR}/.opam/${OPAM_SWITCH}/bin/coq-lsp     /usr/local/bin/coq-lsp \
+  && ln -sf ${WORKINGDIR}/.opam/${OPAM_SWITCH}/bin/coqdep      /usr/local/bin/coqdep \
+  && ln -sf ${WORKINGDIR}/.opam/${OPAM_SWITCH}/bin/coq_makefile /usr/local/bin/coq_makefile \
+  && ln -sf ${WORKINGDIR}/.opam/${OPAM_SWITCH}/bin/coqdoc      /usr/local/bin/coqdoc \
+  && ln -sf ${WORKINGDIR}/.opam/${OPAM_SWITCH}/bin/coqchk      /usr/local/bin/coqchk
 
 # Activate the switch in interactive shells (so `opam` itself works).
 RUN echo 'eval "$(opam env --switch=cloudchor 2>/dev/null)"' >> ${WORKINGDIR}/.bashrc
@@ -187,7 +219,7 @@ RUN pip install scipy
 FROM mkdocs AS neovim-binary
 
 # NVM (required by NeoVim)
-ENV NVM_DIR=/root/.nvm
+ENV NVM_DIR=${WORKINGDIR}/.nvm
 ENV NODE_VERSION=18
 # Make node, npm, and tree-sitter available globally
 ENV PATH="$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH"
@@ -328,7 +360,7 @@ RUN echo 'eval "$(fzf --bash)"' >> ${WORKINGDIR}/.bashrc
 FROM utils-cli AS neovim-config
 
 # NVM (required by NeoVim) 
-ENV NVM_DIR=/root/.nvm
+ENV NVM_DIR=${WORKINGDIR}/.nvm
 ENV NODE_VERSION=18
 # Make node, npm, and tree-sitter available globally
 ENV PATH="$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH"
@@ -395,6 +427,9 @@ RUN mv ${WORKINGDIR}/fourmolu.yaml ${WORKINGDIR}/.local/share/nvim/mason/bin/
 # Expose Mason-managed binaries (e.g. fourmolu) to the CLI / PATH, not just nvim
 ENV PATH="${WORKINGDIR}/.local/share/nvim/mason/bin:$PATH"
 
+# For Claude Code 
+ENV IS_SANDBOX=1 
+
 # CodeCompanion (AI assistant) in NVIM 
 RUN echo 'export XDG_RUNTIME_DIR=/tmp' >> ${WORKINGDIR}/.bashrc
 
@@ -419,5 +454,11 @@ RUN echo '' >> ${WORKINGDIR}/.bashrc && \
 # appended after starship sets the prompt, otherwise zoxide's doctor warns.
 RUN echo 'eval "$(zoxide init bash)"' >> ${WORKINGDIR}/.bashrc
 
+
+# Hand the fully-built home to the unprivileged user, then drop to it.
+ARG USERNAME=dev
+RUN chown -R ${USERNAME}:${USERNAME} ${WORKINGDIR}
+USER ${USERNAME}
+WORKDIR ${WORKINGDIR}
 
 ENTRYPOINT [ "/bin/entrypoint" ]
