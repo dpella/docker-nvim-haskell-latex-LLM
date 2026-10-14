@@ -115,6 +115,9 @@ return {
 	-- Latex
 	{
 		"lervag/vimtex",
+		-- VimTeX master requires nvim >= 0.12.4; the images install nvim
+		-- v0.11.0, so stay on the last compatible release.
+		version = "v2.18",
 		ft = { "tex" },
 		init = function()
 			vim.g.tex_flavor = "latex"
