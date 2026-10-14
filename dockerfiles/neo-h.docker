@@ -20,6 +20,10 @@ ARG USER_GID=1000
 # is handed to the user at the end of the build.
 ENV WORKINGDIR=/home/${USERNAME}
 ENV HOME=${WORKINGDIR}
+# User-local binaries land here (uv's installer, `uv tool install`, pip --user,
+# etc.). Put it on PATH for all shells so those tools resolve without sourcing
+# anything — the course tooling runs `uv run mkdocstocanvas`.
+ENV PATH="${WORKINGDIR}/.local/bin:${PATH}"
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Create the unprivileged user + home BEFORE anything writes into it.
