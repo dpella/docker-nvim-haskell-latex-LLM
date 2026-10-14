@@ -217,6 +217,12 @@ RUN apt-get update \
 #Tools for Python development
 RUN pip install scipy
 
+# uv — fast Python package/project manager (pinned). Installs into
+# ~/.local/bin, already on PATH via the base-stage ENV. The course build runs
+# `uv run mkdocstocanvas`. INSTALLER_NO_MODIFY_PATH avoids editing shell profiles
+# since PATH is handled by ENV.
+RUN curl -LsSf https://astral.sh/uv/0.13.1/install.sh | INSTALLER_NO_MODIFY_PATH=1 sh
+
 ################################
 ### NeoVim Binary ##############
 ################################
