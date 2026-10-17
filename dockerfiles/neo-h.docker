@@ -328,6 +328,22 @@ RUN ARCH="$(uname -m)" && \
     install -m 0755 /tmp/starship /usr/local/bin/starship && \
     rm -f /tmp/starship
 
+##############################################
+# tuicr — TUI code review with vim keybindings
+# Static musl build so it does not depend on the image's glibc.
+##############################################
+ARG TUICR_VERSION=0.27.0
+RUN ARCH="$(uname -m)" && \
+    case "$ARCH" in \
+      x86_64)  TARGET="x86_64-unknown-linux-musl" ;; \
+      aarch64) TARGET="aarch64-unknown-linux-musl" ;; \
+      *) echo "Unsupported arch: $ARCH" && exit 1 ;; \
+    esac && \
+    curl -fsSL "https://github.com/agavra/tuicr/releases/download/v${TUICR_VERSION}/tuicr-${TUICR_VERSION}-${TARGET}.tar.gz" \
+      | tar -xz -C /tmp && \
+    install -m 0755 /tmp/tuicr /usr/local/bin/tuicr && \
+    rm -f /tmp/tuicr
+
 # Starship config
 RUN mkdir -p ${WORKINGDIR}/.config
 COPY ./otherfiles/starship.toml ${WORKINGDIR}/.config/starship.toml

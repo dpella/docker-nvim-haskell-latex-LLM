@@ -93,6 +93,19 @@ return {
 		},
 	},
 
+	-- tuicr (git review) — tuicr code-review TUI in a float; needs the tuicr binary on PATH
+	{
+		"rparrapy/tuicr.nvim",
+		cmd = { "Tuicr", "TuicrToggle" },
+		opts = {
+			close_on_exit = true, -- close the float when tuicr quits (like lazygit)
+			args = { "--theme", "catppuccin-frappe" },
+		},
+		keys = {
+			{ "<leader>gr", "<cmd>Tuicr<cr>", desc = "tuicr (git review)" },
+		},
+	},
+
 	-- Session manager <leader> z
 	{
 		"Shatur/neovim-session-manager",
