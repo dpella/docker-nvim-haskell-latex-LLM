@@ -1,0 +1,7 @@
+# Chalmers remote host. The server refuses ssh -X, so tunnel X by hand:
+# remote port 6010 -> the Windows X server (display :0 = TCP 6000).
+# On remote11 use DISPLAY=localhost:10.
+Host remote11
+    HostName remote11.chalmers.se
+    User russo
+    RemoteForward 6010 host.docker.internal:6000

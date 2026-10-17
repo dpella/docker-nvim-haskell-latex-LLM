@@ -8,5 +8,9 @@ echo "Reading keys from /tmp/ssh"
 cp /tmp/ssh/key "$HOME/.ssh/key"
 chmod 700 "$HOME/.ssh"
 chmod 600 "$HOME/.ssh/key"
+if [ -f /tmp/ssh/config ]; then
+    cp /tmp/ssh/config "$HOME/.ssh/config"
+    chmod 600 "$HOME/.ssh/config"
+fi
 
 exec /bin/bash --login -c "tmux -2"
