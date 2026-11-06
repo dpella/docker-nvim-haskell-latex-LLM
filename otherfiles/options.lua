@@ -13,6 +13,9 @@ local o = vim.o
 -- Bash as terminal
 o.shell = "/usr/bin/bash"
 
+-- 24-bit colour, also inside :terminal (needed for the Claude Code plugin icons)
+o.termguicolors = true
+
 -- Cursor line
 o.cursorline = true
 
