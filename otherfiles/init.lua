@@ -12,7 +12,16 @@ return {
 	-- Tree sitter
 	{
 		"nvim-treesitter/nvim-treesitter",
+		-- The `main` branch needs the latest nvim stable + tree-sitter-cli >= 0.26.1
+		-- (not npm). We run nvim 0.11.0, so stay on `master`, which supports
+		-- ensure_installed / highlight and compiles parsers with gcc.
+		branch = "master",
+		build = ":TSUpdate",
 		opts = {
+			auto_install = true,
+			-- vimtex does the LaTeX highlighting (incl. minted blocks)
+			highlight = { enable = true, disable = { "latex" } },
+			indent = { enable = true },
 			ensure_installed = {
 				-- defaults
 				"vim",
@@ -37,8 +46,20 @@ return {
 			},
 		},
 		config = function(_, opts)
-			-- Use the new module name (config instead of configs)
-			require("nvim-treesitter.config").setup(opts)
+			require("nvim-treesitter.configs").setup(opts)
+			-- NvChad's FileType autocmd calls vim.treesitter.start() on every
+			-- buffer; undo that for tex so vimtex's syntax (minted etc.) is used.
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = "tex",
+				callback = function(ev)
+					vim.schedule(function()
+						if vim.api.nvim_buf_is_valid(ev.buf) then
+							pcall(vim.treesitter.stop, ev.buf)
+							vim.bo[ev.buf].syntax = "tex"
+						end
+					end)
+				end,
+			})
 		end,
 	},
 	-- Maximizes a split for a moment

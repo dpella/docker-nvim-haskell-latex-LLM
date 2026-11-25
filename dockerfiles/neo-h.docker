@@ -443,8 +443,10 @@ RUN \
     /opt/${NVIM}/bin/nvim --headless +"MasonInstall fourmolu" +q && \
     # C/C++ language server
     /opt/${NVIM}/bin/nvim --headless +"MasonInstall clangd" +q && \
-    # Treesitter parsers (yaml required by codecompanion prompt library)
-    /opt/${NVIM}/bin/nvim --headless +"TSInstall yaml" +q
+    # Treesitter parsers (yaml required by codecompanion prompt library).
+    # TSInstallSync so +q doesn't quit before compiling; load the lazy plugin first.
+    /opt/${NVIM}/bin/nvim --headless +"Lazy! load nvim-treesitter" \
+      +"TSInstallSync! yaml vim lua vimdoc haskell markdown markdown_inline latex bibtex html css javascript typescript tsx c zig bash regex query python" +q
 
 # File format options for Haskell code
 COPY ./otherfiles/fourmolu.yaml  ${WORKINGDIR}
